@@ -289,22 +289,38 @@ async function scrapeComissao(comissaoId, comissaoInfo) {
     );
 
     // Guardar na base de dados
+    // Guardar na base de dados
     let novosGuardados = 0;
     for (const doc of todosDocumentos) {
       try {
-        const existe = await Document.findOne({ url: doc.url });
+        // Verificar duplicados por URL OU por título+categoria
+        const existe = await Document.findOne({
+          $or: [
+            { url: doc.url },
+            {
+              titulo: doc.titulo,
+              categoria: doc.categoria,
+            },
+          ],
+        });
 
-        if (!existe && doc.url) {
+        if (!existe && doc.url && doc.titulo) {
           await Document.create({
             ...doc,
-            resumo: doc.titulo.substring(0, 200),
+            resumo: doc.resumo || doc.titulo.substring(0, 200),
           });
 
           novosGuardados++;
+          console.log(`    ✅ Novo: ${doc.titulo}`);
+        } else {
+          console.log(`    ⏭️  Já existe: ${doc.titulo}`);
         }
       } catch (error) {
-        if (error.code !== "23505") {
-          console.error(`  ❌ Erro ao guardar: ${error.message}`);
+        // Erro de duplicado (constraint unique)
+        if (error.code === "23505" || error.code === 23505) {
+          console.log(`    ⏭️  Duplicado ignorado: ${doc.titulo}`);
+        } else {
+          console.error(`    ❌ Erro ao guardar: ${error.message}`);
         }
       }
     }
