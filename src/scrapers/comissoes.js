@@ -65,10 +65,12 @@ const COMISSOES = {
   },
 };
 
-// Extrair AGENDAS
 // Função helper para limpar URLs
 function limparUrl(urlBase, urlRelativo) {
   if (!urlRelativo) return "";
+
+  // Limpar espaços
+  urlRelativo = urlRelativo.trim();
 
   // Se já é URL completo, retornar direto
   if (urlRelativo.startsWith("http://") || urlRelativo.startsWith("https://")) {
@@ -82,11 +84,11 @@ function limparUrl(urlBase, urlRelativo) {
 
   // Se começa com /, é relativo ao domínio
   if (urlRelativo.startsWith("/")) {
-    return `${urlBase}${urlRelativo}`;
+    return `https://www.parlamento.pt${urlRelativo}`;
   }
 
   // Caso contrário, assumir que é relativo
-  return `${urlBase}/${urlRelativo}`;
+  return `https://www.parlamento.pt/${urlRelativo}`;
 }
 
 // Extrair AGENDAS
