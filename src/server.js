@@ -40,7 +40,7 @@ app.get('/api/health', (req, res) => {
 async function iniciarServidor() {
   try {
     await testConnection();
-    iniciarAgendamento();
+    // iniciarAgendamento();
     
     app.listen(PORT, () => {
       console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
