@@ -6,6 +6,8 @@ import {
   FunnelIcon,
   ArrowsUpDownIcon,
   CheckIcon,
+  ArchiveBoxIcon,
+  EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import { useState, useMemo } from "react";
 import { useUser } from "../contexts/UserContext";
@@ -16,8 +18,9 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
   const [tipoFiltro, setTipoFiltro] = useState("todos");
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
+  const [mostrarArquivados, setMostrarArquivados] = useState(false);
   
-  const { foiLido, marcarComoLido } = useUser(); // ← ADICIONAR marcarComoLido
+  const { foiLido, marcarComoLido, estaArquivado, arquivarDocumento, restaurarDocumento } = useUser();
 
   const { id, info, docs } = category;
   const Icon = info.icon;
@@ -33,6 +36,13 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
   // Filtrar e ordenar documentos
   const documentosFiltrados = useMemo(() => {
     let resultado = [...docs];
+
+    // Filtrar arquivados
+    if (!mostrarArquivados) {
+      resultado = resultado.filter(doc => !estaArquivado(doc.id));
+    } else {
+      resultado = resultado.filter(doc => estaArquivado(doc.id));
+    }
 
     if (searchTerm) {
       resultado = resultado.filter((doc) =>
@@ -65,7 +75,7 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
     });
 
     return resultado;
-  }, [docs, searchTerm, sortOrder, tipoFiltro, dataInicio, dataFim]);
+  }, [docs, searchTerm, sortOrder, tipoFiltro, dataInicio, dataFim, mostrarArquivados, estaArquivado]);
 
   // Formatar data
   const formatDate = (dateString) => {
@@ -95,8 +105,9 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
     });
   };
 
-  // Contar documentos não lidos
-  const naoLidos = documentosFiltrados.filter((doc) => !foiLido(doc.id)).length;
+  // Contar documentos não lidos e arquivados
+  const naoLidos = docs.filter((doc) => !foiLido(doc.id) && !estaArquivado(doc.id)).length;
+  const totalArquivados = docs.filter((doc) => estaArquivado(doc.id)).length;
 
   const filtrosAtivos =
     searchTerm || tipoFiltro !== "todos" || dataInicio || dataFim;
@@ -123,29 +134,52 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                     {info.nomeCompleto || info.nome}
                   </h2>
                   <p className="text-sm text-slate-400">
-                    {documentosFiltrados.length} de {docs.length}{" "}
+                    {documentosFiltrados.length} de {docs.length - totalArquivados}{" "}
                     {documentosFiltrados.length === 1
                       ? "documento"
                       : "documentos"}
-                    {naoLidos > 0 && (
+                    {naoLidos > 0 && !mostrarArquivados && (
                       <span className="ml-2 text-red-400">
                         • {naoLidos} {naoLidos === 1 ? "novo" : "novos"}
+                      </span>
+                    )}
+                    {totalArquivados > 0 && (
+                      <span className="ml-2 text-slate-500">
+                        • {totalArquivados} arquivado{totalArquivados !== 1 ? 's' : ''}
                       </span>
                     )}
                   </p>
                 </div>
               </div>
 
-              {/* Botão Marcar Tudo Lido */}
-              {naoLidos > 0 && (
-                <button
-                  onClick={marcarTudoComoLido}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 rounded-lg text-sm text-emerald-400 font-medium transition-all"
-                >
-                  <CheckIcon className="w-4 h-4" />
-                  Marcar tudo lido
-                </button>
-              )}
+              {/* Botões de ação */}
+              <div className="flex items-center gap-2">
+                {/* Toggle Arquivados */}
+                {totalArquivados > 0 && (
+                  <button
+                    onClick={() => setMostrarArquivados(!mostrarArquivados)}
+                    className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
+                      mostrarArquivados
+                        ? 'bg-slate-700 border-slate-600 text-white'
+                        : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:text-white hover:border-slate-600'
+                    }`}
+                  >
+                    <ArchiveBoxIcon className="w-4 h-4" />
+                    {mostrarArquivados ? 'Ver Ativos' : `Arquivados (${totalArquivados})`}
+                  </button>
+                )}
+
+                {/* Marcar tudo lido */}
+                {naoLidos > 0 && !mostrarArquivados && (
+                  <button
+                    onClick={marcarTudoComoLido}
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 rounded-lg text-sm text-emerald-400 font-medium transition-all"
+                  >
+                    <CheckIcon className="w-4 h-4" />
+                    Marcar tudo lido
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -158,87 +192,83 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
         </div>
 
         {/* Filtros */}
-        <div className="border-b border-slate-700 bg-slate-900/50 p-4 space-y-3 flex-shrink-0">
-          {/* Linha 1: Search + Ordenação */}
-          <div className="flex gap-3">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-              <input
-                type="text"
-                placeholder="Pesquisar documentos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
-              />
+        {!mostrarArquivados && (
+          <div className="border-b border-slate-700 bg-slate-900/50 p-4 space-y-3 flex-shrink-0">
+            {/* Linha 1: Search + Ordenação */}
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Pesquisar documentos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                />
+              </div>
+
+              <button
+                onClick={() =>
+                  setSortOrder(sortOrder === "desc" ? "asc" : "desc")
+                }
+                className="flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-slate-600 transition-colors"
+                title={
+                  sortOrder === "desc"
+                    ? "Mais recente primeiro"
+                    : "Mais antigo primeiro"
+                }
+              >
+                <ArrowsUpDownIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">
+                  {sortOrder === "desc" ? "Recente" : "Antigo"}
+                </span>
+              </button>
             </div>
 
-            {/* Ordenação */}
-            <button
-              onClick={() =>
-                setSortOrder(sortOrder === "desc" ? "asc" : "desc")
-              }
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 hover:text-white hover:border-slate-600 transition-colors"
-              title={
-                sortOrder === "desc"
-                  ? "Mais recente primeiro"
-                  : "Mais antigo primeiro"
-              }
-            >
-              <ArrowsUpDownIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">
-                {sortOrder === "desc" ? "Recente" : "Antigo"}
-              </span>
-            </button>
-          </div>
+            {/* Linha 2: Filtros Avançados */}
+            <div className="flex flex-wrap gap-3">
+              {tiposDisponiveis.length > 0 && (
+                <select
+                  value={tipoFiltro}
+                  onChange={(e) => setTipoFiltro(e.target.value)}
+                  className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                >
+                  <option value="todos">Todos os tipos</option>
+                  {tiposDisponiveis.map((tipo) => (
+                    <option key={tipo} value={tipo}>
+                      {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              )}
 
-          {/* Linha 2: Filtros Avançados */}
-          <div className="flex flex-wrap gap-3">
-            {/* Tipo */}
-            {tiposDisponiveis.length > 0 && (
-              <select
-                value={tipoFiltro}
-                onChange={(e) => setTipoFiltro(e.target.value)}
+              <input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
                 className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
-              >
-                <option value="todos">Todos os tipos</option>
-                {tiposDisponiveis.map((tipo) => (
-                  <option key={tipo} value={tipo}>
-                    {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-                  </option>
-                ))}
-              </select>
-            )}
+                placeholder="De"
+              />
 
-            {/* Data Início */}
-            <input
-              type="date"
-              value={dataInicio}
-              onChange={(e) => setDataInicio(e.target.value)}
-              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
-              placeholder="De"
-            />
+              <input
+                type="date"
+                value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
+                className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                placeholder="Até"
+              />
 
-            {/* Data Fim */}
-            <input
-              type="date"
-              value={dataFim}
-              onChange={(e) => setDataFim(e.target.value)}
-              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
-              placeholder="Até"
-            />
-
-            {/* Limpar Filtros */}
-            {filtrosAtivos && (
-              <button
-                onClick={limparFiltros}
-                className="px-3 py-2 text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                Limpar
-              </button>
-            )}
+              {filtrosAtivos && (
+                <button
+                  onClick={limparFiltros}
+                  className="px-3 py-2 text-sm text-slate-400 hover:text-white transition-colors"
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Lista de Documentos */}
         <div
@@ -247,9 +277,15 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
         >
           {documentosFiltrados.length === 0 ? (
             <div className="text-center py-12">
-              <FunnelIcon className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+              {mostrarArquivados ? (
+                <ArchiveBoxIcon className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+              ) : (
+                <FunnelIcon className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+              )}
               <p className="text-slate-500 text-sm">
-                {filtrosAtivos
+                {mostrarArquivados
+                  ? 'Nenhum documento arquivado'
+                  : filtrosAtivos
                   ? "Nenhum documento encontrado com estes filtros"
                   : "Sem documentos"}
               </p>
@@ -258,14 +294,17 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
             <div className="divide-y divide-slate-700/50">
               {documentosFiltrados.map((doc, index) => {
                 const isNew = !foiLido(doc.id);
+                const isArchived = estaArquivado(doc.id);
 
                 return (
-                  <button
+                  <div
                     key={index}
-                    onClick={() => onSelectDocument(doc)}
-                    className="w-full p-4 hover:bg-slate-800/50 transition-colors text-left group"
+                    className="group relative hover:bg-slate-800/50 transition-colors"
                   >
-                    <div className="flex items-start gap-3">
+                    <button
+                      onClick={() => onSelectDocument(doc)}
+                      className="w-full p-4 text-left flex items-start gap-3"
+                    >
                       {/* Icon */}
                       <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-slate-700 transition-colors flex-shrink-0">
                         <DocumentTextIcon className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 transition-colors" />
@@ -277,7 +316,7 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                           <h3 className="font-medium text-sm text-white group-hover:text-emerald-400 transition-colors line-clamp-2 flex-1">
                             {doc.titulo}
                           </h3>
-                          {isNew && (
+                          {isNew && !isArchived && (
                             <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1.5 animate-pulse"></div>
                           )}
                         </div>
@@ -300,8 +339,28 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                           )}
                         </div>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+
+                    {/* Botão Arquivar/Restaurar */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isArchived) {
+                          restaurarDocumento(doc.id);
+                        } else {
+                          arquivarDocumento(doc.id);
+                        }
+                      }}
+                      className="absolute top-4 right-4 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                      title={isArchived ? 'Restaurar' : 'Arquivar'}
+                    >
+                      {isArchived ? (
+                        <EyeSlashIcon className="w-4 h-4 text-emerald-400" />
+                      ) : (
+                        <ArchiveBoxIcon className="w-4 h-4 text-slate-400 hover:text-red-400" />
+                      )}
+                    </button>
+                  </div>
                 );
               })}
             </div>
