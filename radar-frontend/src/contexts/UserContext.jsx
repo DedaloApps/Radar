@@ -166,6 +166,51 @@ export const UserProvider = ({ children }) => {
     setDocumentosArquivados([]);
   };
 
+  // Estado para documentos favoritos
+  const [documentosFavoritos, setDocumentosFavoritos] = useState(() => {
+    const saved = localStorage.getItem("radar_documentos_favoritos");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Salvar documentos favoritos no localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      "radar_documentos_favoritos",
+      JSON.stringify(documentosFavoritos)
+    );
+  }, [documentosFavoritos]);
+
+  // Adicionar aos favoritos
+  const adicionarFavorito = (documentoId) => {
+    if (!documentosFavoritos.includes(documentoId)) {
+      setDocumentosFavoritos((prev) => [...prev, documentoId]);
+    }
+  };
+
+  // Remover dos favoritos
+  const removerFavorito = (documentoId) => {
+    setDocumentosFavoritos((prev) => prev.filter((id) => id !== documentoId));
+  };
+
+  // Toggle favorito
+  const toggleFavorito = (documentoId) => {
+    if (documentosFavoritos.includes(documentoId)) {
+      removerFavorito(documentoId);
+    } else {
+      adicionarFavorito(documentoId);
+    }
+  };
+
+  // Verificar se é favorito
+  const eFavorito = (documentoId) => {
+    return documentosFavoritos.includes(documentoId);
+  };
+
+  // Limpar favoritos
+  const limparFavoritos = () => {
+    setDocumentosFavoritos([]);
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -187,6 +232,12 @@ export const UserProvider = ({ children }) => {
         restaurarDocumento, // ← NOVO
         estaArquivado, // ← NOVO
         limparArquivados, // ← NOVO
+        documentosFavoritos, // ← NOVO
+        adicionarFavorito, // ← NOVO
+        removerFavorito, // ← NOVO
+        toggleFavorito, // ← NOVO
+        eFavorito, // ← NOVO
+        limparFavoritos, // ← NOVO
       }}
     >
       {children}

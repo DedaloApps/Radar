@@ -8,6 +8,7 @@ import {
   CheckIcon,
   ArchiveBoxIcon,
   EyeSlashIcon,
+  StarIcon,
 } from "@heroicons/react/24/outline";
 import { useState, useMemo } from "react";
 import { useUser } from "../contexts/UserContext";
@@ -19,8 +20,15 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
   const [mostrarArquivados, setMostrarArquivados] = useState(false);
-  
-  const { foiLido, marcarComoLido, estaArquivado, arquivarDocumento, restaurarDocumento } = useUser();
+
+  const {
+    foiLido,
+    marcarComoLido,
+    estaArquivado,
+    arquivarDocumento,
+    restaurarDocumento,
+    toggleFavorito,
+  } = useUser();
 
   const { id, info, docs } = category;
   const Icon = info.icon;
@@ -39,9 +47,9 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
 
     // Filtrar arquivados
     if (!mostrarArquivados) {
-      resultado = resultado.filter(doc => !estaArquivado(doc.id));
+      resultado = resultado.filter((doc) => !estaArquivado(doc.id));
     } else {
-      resultado = resultado.filter(doc => estaArquivado(doc.id));
+      resultado = resultado.filter((doc) => estaArquivado(doc.id));
     }
 
     if (searchTerm) {
@@ -75,7 +83,16 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
     });
 
     return resultado;
-  }, [docs, searchTerm, sortOrder, tipoFiltro, dataInicio, dataFim, mostrarArquivados, estaArquivado]);
+  }, [
+    docs,
+    searchTerm,
+    sortOrder,
+    tipoFiltro,
+    dataInicio,
+    dataFim,
+    mostrarArquivados,
+    estaArquivado,
+  ]);
 
   // Formatar data
   const formatDate = (dateString) => {
@@ -106,7 +123,9 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
   };
 
   // Contar documentos não lidos e arquivados
-  const naoLidos = docs.filter((doc) => !foiLido(doc.id) && !estaArquivado(doc.id)).length;
+  const naoLidos = docs.filter(
+    (doc) => !foiLido(doc.id) && !estaArquivado(doc.id)
+  ).length;
   const totalArquivados = docs.filter((doc) => estaArquivado(doc.id)).length;
 
   const filtrosAtivos =
@@ -134,7 +153,8 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                     {info.nomeCompleto || info.nome}
                   </h2>
                   <p className="text-sm text-slate-400">
-                    {documentosFiltrados.length} de {docs.length - totalArquivados}{" "}
+                    {documentosFiltrados.length} de{" "}
+                    {docs.length - totalArquivados}{" "}
                     {documentosFiltrados.length === 1
                       ? "documento"
                       : "documentos"}
@@ -145,7 +165,8 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                     )}
                     {totalArquivados > 0 && (
                       <span className="ml-2 text-slate-500">
-                        • {totalArquivados} arquivado{totalArquivados !== 1 ? 's' : ''}
+                        • {totalArquivados} arquivado
+                        {totalArquivados !== 1 ? "s" : ""}
                       </span>
                     )}
                   </p>
@@ -153,6 +174,53 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
               </div>
 
               {/* Botões de ação */}
+              <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                {/* Botão Favorito */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorito(doc.id);
+                  }}
+                  className={`p-2 rounded-lg transition-all ${
+                    eFavorito(doc.id)
+                      ? "bg-amber-500/20 hover:bg-amber-500/30"
+                      : "bg-slate-800 hover:bg-slate-700"
+                  }`}
+                  title={
+                    eFavorito(doc.id)
+                      ? "Remover dos favoritos"
+                      : "Adicionar aos favoritos"
+                  }
+                >
+                  <StarIcon
+                    className={`w-4 h-4 ${
+                      eFavorito(doc.id)
+                        ? "text-amber-400 fill-amber-400"
+                        : "text-slate-400"
+                    }`}
+                  />
+                </button>
+
+                {/* Botão Arquivar/Restaurar */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isArchived) {
+                      restaurarDocumento(doc.id);
+                    } else {
+                      arquivarDocumento(doc.id);
+                    }
+                  }}
+                  className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-all"
+                  title={isArchived ? "Restaurar" : "Arquivar"}
+                >
+                  {isArchived ? (
+                    <EyeSlashIcon className="w-4 h-4 text-emerald-400" />
+                  ) : (
+                    <ArchiveBoxIcon className="w-4 h-4 text-slate-400 hover:text-red-400" />
+                  )}
+                </button>
+              </div>
               <div className="flex items-center gap-2">
                 {/* Toggle Arquivados */}
                 {totalArquivados > 0 && (
@@ -160,12 +228,14 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                     onClick={() => setMostrarArquivados(!mostrarArquivados)}
                     className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
                       mostrarArquivados
-                        ? 'bg-slate-700 border-slate-600 text-white'
-                        : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:text-white hover:border-slate-600'
+                        ? "bg-slate-700 border-slate-600 text-white"
+                        : "bg-slate-800/50 border-slate-700 text-slate-400 hover:text-white hover:border-slate-600"
                     }`}
                   >
                     <ArchiveBoxIcon className="w-4 h-4" />
-                    {mostrarArquivados ? 'Ver Ativos' : `Arquivados (${totalArquivados})`}
+                    {mostrarArquivados
+                      ? "Ver Ativos"
+                      : `Arquivados (${totalArquivados})`}
                   </button>
                 )}
 
@@ -284,7 +354,7 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
               )}
               <p className="text-slate-500 text-sm">
                 {mostrarArquivados
-                  ? 'Nenhum documento arquivado'
+                  ? "Nenhum documento arquivado"
                   : filtrosAtivos
                   ? "Nenhum documento encontrado com estes filtros"
                   : "Sem documentos"}
@@ -352,7 +422,7 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                         }
                       }}
                       className="absolute top-4 right-4 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                      title={isArchived ? 'Restaurar' : 'Arquivar'}
+                      title={isArchived ? "Restaurar" : "Arquivar"}
                     >
                       {isArchived ? (
                         <EyeSlashIcon className="w-4 h-4 text-emerald-400" />
