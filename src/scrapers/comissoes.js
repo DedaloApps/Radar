@@ -290,40 +290,43 @@ async function scrapeComissao(comissaoId, comissaoInfo) {
 
     // Guardar na base de dados
     let novosGuardados = 0;
+    let duplicadosIgnorados = 0;
+
     for (const doc of todosDocumentos) {
       try {
-        // VERIFICAÇÃO CORRIGIDA para Supabase
-        // Primeiro tenta por URL
-        let existe = doc.url ? await Document.findOne({ url: doc.url }) : null;
-
-        // Se não encontrou por URL, tenta por título + categoria
-        if (!existe && doc.titulo && doc.categoria) {
-          existe = await Document.findOne({
-            titulo: doc.titulo,
-            categoria: doc.categoria,
-          });
+        if (!doc.url || !doc.titulo) {
+          console.log(`    ⏭️  Documento inválido (sem URL ou título)`);
+          continue;
         }
 
-        if (!existe && doc.url && doc.titulo) {
-          await Document.create({
-            ...doc,
-            resumo: doc.resumo || doc.titulo.substring(0, 200),
-          });
+        // Tentar criar diretamente
+        // Se for duplicado, o UNIQUE INDEX vai rejeitar
+        await Document.create({
+          ...doc,
+          resumo: doc.resumo || doc.titulo.substring(0, 200),
+        });
 
-          novosGuardados++;
-          console.log(`    ✅ Novo: ${doc.titulo}`);
-        } else {
-          console.log(`    ⏭️  Já existe: ${doc.titulo}`);
-        }
+        novosGuardados++;
+        console.log(`    ✅ Novo: ${doc.titulo}`);
       } catch (error) {
-        // Erro de duplicado (constraint unique)
-        if (error.code === "23505" || error.code === 23505) {
-          console.log(`    ⏭️  Duplicado ignorado: ${doc.titulo}`);
+        // Erro 23505 = violação de UNIQUE constraint (duplicado)
+        if (
+          error.code === "23505" ||
+          error.message?.includes("duplicate key")
+        ) {
+          duplicadosIgnorados++;
+          // NÃO loggar cada duplicado (muito spam)
         } else {
-          console.error(`    ❌ Erro ao guardar: ${error.message}`);
+          console.error(
+            `    ❌ Erro ao guardar "${doc.titulo}": ${error.message}`
+          );
         }
       }
     }
+
+    console.log(
+      `  ✅ ${comissaoInfo.nome}: ${novosGuardados} novos, ${duplicadosIgnorados} duplicados ignorados`
+    );
 
     console.log(
       `  ✅ ${comissaoInfo.nome}: ${novosGuardados} novos documentos guardados`
