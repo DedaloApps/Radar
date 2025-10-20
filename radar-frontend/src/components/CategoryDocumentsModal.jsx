@@ -28,6 +28,7 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
     arquivarDocumento,
     restaurarDocumento,
     toggleFavorito,
+    eFavorito,
   } = useUser();
 
   const { id, info, docs } = category;
@@ -174,53 +175,6 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
               </div>
 
               {/* Botões de ação */}
-              <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                {/* Botão Favorito */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorito(doc.id);
-                  }}
-                  className={`p-2 rounded-lg transition-all ${
-                    eFavorito(doc.id)
-                      ? "bg-amber-500/20 hover:bg-amber-500/30"
-                      : "bg-slate-800 hover:bg-slate-700"
-                  }`}
-                  title={
-                    eFavorito(doc.id)
-                      ? "Remover dos favoritos"
-                      : "Adicionar aos favoritos"
-                  }
-                >
-                  <StarIcon
-                    className={`w-4 h-4 ${
-                      eFavorito(doc.id)
-                        ? "text-amber-400 fill-amber-400"
-                        : "text-slate-400"
-                    }`}
-                  />
-                </button>
-
-                {/* Botão Arquivar/Restaurar */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (isArchived) {
-                      restaurarDocumento(doc.id);
-                    } else {
-                      arquivarDocumento(doc.id);
-                    }
-                  }}
-                  className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-all"
-                  title={isArchived ? "Restaurar" : "Arquivar"}
-                >
-                  {isArchived ? (
-                    <EyeSlashIcon className="w-4 h-4 text-emerald-400" />
-                  ) : (
-                    <ArchiveBoxIcon className="w-4 h-4 text-slate-400 hover:text-red-400" />
-                  )}
-                </button>
-              </div>
               <div className="flex items-center gap-2">
                 {/* Toggle Arquivados */}
                 {totalArquivados > 0 && (
@@ -411,25 +365,46 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                       </div>
                     </button>
 
-                    {/* Botão Arquivar/Restaurar */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (isArchived) {
-                          restaurarDocumento(doc.id);
-                        } else {
-                          arquivarDocumento(doc.id);
-                        }
-                      }}
-                      className="absolute top-4 right-4 p-2 bg-slate-800 hover:bg-slate-700 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                      title={isArchived ? "Restaurar" : "Arquivar"}
-                    >
-                      {isArchived ? (
-                        <EyeSlashIcon className="w-4 h-4 text-emerald-400" />
-                      ) : (
-                        <ArchiveBoxIcon className="w-4 h-4 text-slate-400 hover:text-red-400" />
-                      )}
-                    </button>
+                    {/* Botões Favorito + Arquivar/Restaurar */}
+                    <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                      {/* Botão Favorito */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorito(doc.id);
+                        }}
+                        className={`p-2 rounded-lg transition-all ${
+                          eFavorito(doc.id)
+                            ? 'bg-amber-500/20 hover:bg-amber-500/30'
+                            : 'bg-slate-800 hover:bg-slate-700'
+                        }`}
+                        title={eFavorito(doc.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                      >
+                        <StarIcon className={`w-4 h-4 ${
+                          eFavorito(doc.id) ? 'text-amber-400 fill-amber-400' : 'text-slate-400'
+                        }`} />
+                      </button>
+
+                      {/* Botão Arquivar/Restaurar */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (isArchived) {
+                            restaurarDocumento(doc.id);
+                          } else {
+                            arquivarDocumento(doc.id);
+                          }
+                        }}
+                        className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-all"
+                        title={isArchived ? 'Restaurar' : 'Arquivar'}
+                      >
+                        {isArchived ? (
+                          <EyeSlashIcon className="w-4 h-4 text-emerald-400" />
+                        ) : (
+                          <ArchiveBoxIcon className="w-4 h-4 text-slate-400 hover:text-red-400" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 );
               })}
