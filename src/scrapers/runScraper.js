@@ -28,12 +28,22 @@ export async function executarScraping() {
     console.log(`\n⏱️  Tempo total: ${duracao}s`);
     console.log('✅ Scraping concluído com sucesso!\n');
     
+    return totalNovos;
+    
   } catch (error) {
     console.error('❌ ERRO:', error.message);
+    console.error(error.stack);
+    throw error;
   }
 }
 
-// APENAS executar se chamado diretamente via npm run scrape
-if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}`) {
-  executarScraping().then(() => process.exit(0));
-}
+// Executar se chamado diretamente
+executarScraping()
+  .then((total) => {
+    console.log(`🎉 Finalizado! Total: ${total} documentos novos`);
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('💥 Erro fatal:', error);
+    process.exit(1);
+  });
