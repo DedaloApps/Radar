@@ -289,20 +289,20 @@ async function scrapeComissao(comissaoId, comissaoInfo) {
     );
 
     // Guardar na base de dados
-    // Guardar na base de dados
     let novosGuardados = 0;
     for (const doc of todosDocumentos) {
       try {
-        // Verificar duplicados por URL OU por título+categoria
-        const existe = await Document.findOne({
-          $or: [
-            { url: doc.url },
-            {
-              titulo: doc.titulo,
-              categoria: doc.categoria,
-            },
-          ],
-        });
+        // VERIFICAÇÃO CORRIGIDA para Supabase
+        // Primeiro tenta por URL
+        let existe = doc.url ? await Document.findOne({ url: doc.url }) : null;
+
+        // Se não encontrou por URL, tenta por título + categoria
+        if (!existe && doc.titulo && doc.categoria) {
+          existe = await Document.findOne({
+            titulo: doc.titulo,
+            categoria: doc.categoria,
+          });
+        }
 
         if (!existe && doc.url && doc.titulo) {
           await Document.create({
