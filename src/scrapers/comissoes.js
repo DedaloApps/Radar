@@ -28,7 +28,7 @@ const COMISSOES = {
     nome: "Economia e Coesão",
   },
   comissao_07: {
-    url: "https://www.parlamento.pt/sites/com/XVIILeg/7CAP/Paginas/default.aspx",
+    url: "https://www.parlamento.pt/sites/com/XVIILeg/7CAPes/Paginas/default.aspx",
     nome: "Agricultura e Pescas",
   }, // ← Esta dá 404
   comissao_08: {
@@ -44,7 +44,7 @@ const COMISSOES = {
     nome: "Trabalho e Seg. Social",
   },
   comissao_11: {
-    url: "https://www.parlamento.pt/sites/com/XVIILeg/11CAE/Paginas/default.aspx",
+    url: "https://www.parlamento.pt/sites/com/XVIILeg/11CAEne/Paginas/default.aspx",
     nome: "Ambiente e Energia",
   }, // ← Esta dá 404
   comissao_12: {
