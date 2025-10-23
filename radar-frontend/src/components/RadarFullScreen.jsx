@@ -109,8 +109,8 @@ const RadarFullScreen = ({ stats, documents }) => {
         {/* Linhas radiais */}
         {categoriasList.map((_, index) => {
           const angle = (angleStep * index - 90) * (Math.PI / 180);
-          const x = `${50 + Math.cos(angle) * 45}%`;
-          const y = `${50 + Math.sin(angle) * 45}%`;
+          const x = `${50 + Math.cos(angle) * 35}%`; {/* ALTERADO: 45 -> 35 */}
+          const y = `${50 + Math.sin(angle) * 35}%`; {/* ALTERADO: 45 -> 35 */}
           return (
             <line
               key={index}
@@ -158,7 +158,7 @@ const RadarFullScreen = ({ stats, documents }) => {
         const { total, documents: categoryDocs } = getCategoryData(categoria);
         const Icon = info.icon;
 
-        const radius = 40;
+        const radius = 35; {/* ALTERADO: 40 -> 35 */}
         const x = 50 + Math.cos(angle) * radius;
         const y = 50 + Math.sin(angle) * radius;
 
@@ -221,15 +221,7 @@ const RadarFullScreen = ({ stats, documents }) => {
                     {info.nome}
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-emerald-500 transition-all duration-1000"
-                      style={{
-                        width: `${Math.min((total / maxValue) * 100, 100)}%`,
-                      }}
-                    ></div>
-                  </div>
+                  {/* REMOVIDO: Progress Bar */}
 
                   {/* Ver Mais - Aparece no hover */}
                   {isHovered && categoryDocs.length > 0 && (
