@@ -1,113 +1,145 @@
 import { 
   BellIcon, 
-  ArrowPathIcon, 
   Cog6ToothIcon,
+  MagnifyingGlassIcon,
+  ArrowPathIcon,
   ShieldCheckIcon,
-  StarIcon 
+  ArrowRightOnRectangleIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
+import { BellIcon as BellSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
+import { useAuth } from '../contexts/AuthContext';
 
-const Header = ({
-  ultimaAtualizacao,
-  notificationEnabled,
+const Header = ({ 
+  ultimaAtualizacao, 
+  notificationEnabled, 
   onToggleNotifications,
   onRefresh,
   onOpenConfig,
   onOpenAdmin,
+  onOpenFavorites,
   isRefreshing,
-  documentosFavoritos,
-  onOpenFavoritos,
+  favoritesEnabled
 }) => {
-  const formatTime = (date) => {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleTimeString('pt-PT', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const { user, logout, isAdmin } = useAuth();
 
   return (
-    <div className="flex items-center justify-between">
-      {/* Logo e Info */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <span className="text-white font-black text-xl">R</span>
+    <header className="rounded-2xl p-4 mb-6">
+      <div className="flex items-center justify-between">
+        {/* Logo e Título */}
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl blur-xl opacity-60 animate-pulse"></div>
+            <div className="relative">
+              <img 
+                src="/dedalo.png" 
+                alt="Dédalo Logo" 
+                className="w-16 h-16 object-contain"
+              />
+            </div>
           </div>
+          
           <div>
-            <h1 className="text-white font-bold text-xl tracking-tight">
-              Radar Legislativo
+            <h1 className="text-3xl font-black bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 bg-clip-text text-transparent drop-shadow-lg">
+              RADAR LEGISLATIVO
             </h1>
-            <p className="text-slate-400 text-xs">
-              Última atualização: {formatTime(ultimaAtualizacao)}
+            <p className="text-sm text-emerald-300 font-semibold tracking-wide">
+              Olá, {user?.nome || 'Utilizador'} 👋
             </p>
           </div>
         </div>
-      </div>
 
-      {/* Botões de Ação */}
-      <div className="flex items-center gap-3">
-        {/* Notificações */}
-        <button
-          onClick={onToggleNotifications}
-          className={`p-3 rounded-xl transition-all ${
-            notificationEnabled
-              ? 'bg-emerald-500/20 text-emerald-400'
-              : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-          }`}
-          title="Notificações"
-        >
-          <BellIcon className="w-6 h-6" />
-        </button>
-
-        {/* Favoritos */}
-        <button
-          onClick={onOpenFavoritos}
-          className="relative p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all group"
-          title="Favoritos"
-        >
-          <StarIcon className="w-6 h-6 text-amber-400" />
-          {documentosFavoritos && documentosFavoritos.length > 0 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-              {documentosFavoritos.length > 99 ? '99+' : documentosFavoritos.length}
+        {/* Controles à direita */}
+        <div className="flex items-center gap-3">
+          {/* Status */}
+          {ultimaAtualizacao && (
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-lg border border-emerald-500/30 backdrop-blur-sm">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400"></div>
+              <span className="text-xs text-emerald-300 font-semibold">
+                Atualizado {new Date(ultimaAtualizacao).toLocaleTimeString('pt-PT')}
+              </span>
             </div>
           )}
-        </button>
 
-        {/* Refresh */}
-        <button
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all disabled:opacity-50"
-          title="Atualizar"
-        >
-          <ArrowPathIcon
-            className={`w-6 h-6 text-slate-300 ${
-              isRefreshing ? 'animate-spin' : ''
-            }`}
-          />
-        </button>
+          {/* Botão Admin (só para admins) */}
+          {isAdmin && onOpenAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="p-3 bg-yellow-500/10 hover:bg-yellow-500/20 rounded-xl border border-yellow-500/30 transition-all backdrop-blur-sm hover:shadow-lg hover:shadow-yellow-500/20"
+              title="Admin Dashboard"
+            >
+              <ShieldCheckIcon className="w-5 h-5 text-yellow-400" />
+            </button>
+          )}
 
-        {/* Configurações */}
-        <button
-          onClick={onOpenConfig}
-          className="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all"
-          title="Configurações"
-        >
-          <Cog6ToothIcon className="w-6 h-6 text-slate-300" />
-        </button>
-
-        {/* Admin (se disponível) */}
-        {onOpenAdmin && (
+          {/* Botão Refresh */}
           <button
-            onClick={onOpenAdmin}
-            className="p-3 bg-purple-500/20 hover:bg-purple-500/30 rounded-xl transition-all"
-            title="Admin"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="p-3 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/30 transition-all group backdrop-blur-sm hover:shadow-lg hover:shadow-emerald-500/20"
+            title="Atualizar dados"
           >
-            <ShieldCheckIcon className="w-6 h-6 text-purple-400" />
+            <ArrowPathIcon className={`w-5 h-5 text-emerald-300 ${isRefreshing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
           </button>
-        )}
+
+          {/* Botão Pesquisa */}
+          <button className="p-3 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/30 transition-all backdrop-blur-sm hover:shadow-lg hover:shadow-emerald-500/20">
+            <MagnifyingGlassIcon className="w-5 h-5 text-emerald-300" />
+          </button>
+
+          {/* Botão Notificações */}
+          <button
+            onClick={onToggleNotifications}
+            className={`p-3 rounded-xl border transition-all backdrop-blur-sm ${
+              notificationEnabled
+                ? 'bg-emerald-500/20 border-emerald-400/50 shadow-xl shadow-emerald-500/30'
+                : 'bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/20'
+            }`}
+            title={notificationEnabled ? 'Notificações ativadas' : 'Ativar notificações'}
+          >
+            {notificationEnabled ? (
+              <BellSolidIcon className="w-5 h-5 text-emerald-300 animate-pulse" />
+            ) : (
+              <BellIcon className="w-5 h-5 text-emerald-300" />
+            )}
+          </button>
+
+          {/* Botão Favoritos */}
+          <button
+            onClick={onOpenFavorites}
+            className={`p-3 rounded-xl border transition-all backdrop-blur-sm ${
+              favoritesEnabled
+                ? 'bg-amber-500/20 border-amber-400/50 shadow-xl shadow-amber-500/30'
+                : 'bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/20'
+            }`}
+            title="Favoritos"
+          >
+            {favoritesEnabled ? (
+              <StarSolidIcon className="w-5 h-5 text-amber-400" />
+            ) : (
+              <StarIcon className="w-5 h-5 text-emerald-300" />
+            )}
+          </button>
+
+          {/* Botão Configurações */}
+          <button 
+            onClick={onOpenConfig}
+            className="p-3 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-xl border border-emerald-500/30 transition-all backdrop-blur-sm hover:shadow-lg hover:shadow-emerald-500/20"
+          >
+            <Cog6ToothIcon className="w-5 h-5 text-emerald-300" />
+          </button>
+
+          {/* Botão Logout */}
+          <button
+            onClick={logout}
+            className="p-3 bg-red-500/10 hover:bg-red-500/20 rounded-xl border border-red-500/30 transition-all backdrop-blur-sm hover:shadow-lg hover:shadow-red-500/20"
+            title="Sair"
+          >
+            <ArrowRightOnRectangleIcon className="w-5 h-5 text-red-400" />
+          </button>
+        </div>
       </div>
-    </div>
+    </header>
   );
 };
 

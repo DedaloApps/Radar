@@ -1,9 +1,9 @@
-import { XMarkIcon, CalendarIcon, DocumentTextIcon, ArrowTopRightOnSquareIcon, HashtagIcon, UserIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CalendarIcon, DocumentTextIcon, ArrowTopRightOnSquareIcon, HashtagIcon, UserIcon, MapPinIcon, ClockIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { getCategoriaInfo } from '../utils/categories';
 import { useEffect } from 'react';
 import { useUser } from '../contexts/UserContext';
 
-const DocumentDetailModal = ({ document, onClose }) => {
+const DocumentDetailModal = ({ document, onClose, onBack }) => {
   const info = getCategoriaInfo(document.categoria);
   const Icon = info.icon;
   const { marcarComoLido } = useUser();
@@ -47,7 +47,7 @@ const DocumentDetailModal = ({ document, onClose }) => {
       >
         {/* Header Minimalista */}
         <div className="relative border-b border-slate-700 bg-slate-900 flex-shrink-0">
-          <div className="p-6 pr-16">
+          <div className="p-6 pr-16 pl-16">
             <div className="flex items-center gap-4 mb-3">
               <div className="p-3 bg-slate-800 rounded-xl">
                 <Icon className="w-6 h-6 text-emerald-400" />
@@ -63,6 +63,18 @@ const DocumentDetailModal = ({ document, onClose }) => {
             </div>
           </div>
           
+          {/* Botão Voltar (à esquerda) */}
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="absolute top-6 left-6 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-2 group"
+              title="Voltar à categoria"
+            >
+              <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            </button>
+          )}
+
+          {/* Botão Fechar (à direita) */}
           <button
             onClick={onClose}
             className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"

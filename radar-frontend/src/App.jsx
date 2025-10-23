@@ -71,9 +71,10 @@ function AppContent() {
           onRefresh={handleRefresh}
           onOpenConfig={() => setIsConfigOpen(true)}
           onOpenAdmin={isAdmin ? () => setIsAdminOpen(true) : null}
+          onOpenFavorites={() => setMostrarFavoritos(true)}
+          favoritesEnabled={mostrarFavoritos}
+          favoritesCount={documentosFavoritos.length}
           isRefreshing={isRefreshing}
-          documentosFavoritos={documentosFavoritos}
-          onOpenFavoritos={() => setMostrarFavoritos(true)}
         />
       </div>
 

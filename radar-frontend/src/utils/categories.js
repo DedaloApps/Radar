@@ -13,7 +13,11 @@ import {
   MusicalNoteIcon,
   BuildingOffice2Icon,
   HomeModernIcon,
-  EyeIcon
+  EyeIcon,
+  DocumentCheckIcon,
+  ChatBubbleLeftRightIcon,
+  HandRaisedIcon,
+  DocumentMagnifyingGlassIcon,
 } from '@heroicons/react/24/solid';
 
 export const COMISSOES = {
@@ -99,7 +103,7 @@ export const COMISSOES = {
     bgCor: 'bg-lime-500/10',
     shadowCor: 'shadow-lime-500/50',
     textCor: 'text-lime-400',
-    url: 'https://www.parlamento.pt/sites/com/XVIILeg/7CAP/Paginas/default.aspx'
+    url: 'https://www.parlamento.pt/sites/com/XVIILeg/7CAPes/Paginas/default.aspx'
   },
   comissao_08: {
     numero: '8.ª',
@@ -147,7 +151,7 @@ export const COMISSOES = {
     bgCor: 'bg-green-500/10',
     shadowCor: 'shadow-green-500/50',
     textCor: 'text-green-400',
-    url: 'https://www.parlamento.pt/sites/com/XVIILeg/11CAE/Paginas/default.aspx'
+    url: 'https://www.parlamento.pt/sites/com/XVIILeg/11CAEne/Paginas/default.aspx'
   },
   comissao_12: {
     numero: '12.ª',
@@ -196,6 +200,55 @@ export const COMISSOES = {
     shadowCor: 'shadow-teal-500/50',
     textCor: 'text-teal-400',
     url: 'https://www.parlamento.pt/sites/com/XVIILeg/15CTED/Paginas/default.aspx'
+  },
+  // NOVAS CATEGORIAS GERAIS
+  geral_iniciativas: {
+    numero: '🆕',
+    nome: 'Últimas Iniciativas',
+    nomeCompleto: 'Últimas Iniciativas Entradas',
+    icon: DocumentCheckIcon,
+    cor: 'from-blue-400 to-indigo-500',
+    borderCor: 'border-blue-500',
+    bgCor: 'bg-blue-500/10',
+    shadowCor: 'shadow-blue-500/50',
+    textCor: 'text-blue-400',
+    url: 'https://www.parlamento.pt/Paginas/UltimasIniciativasEntradas.aspx'
+  },
+  geral_perguntas: {
+    numero: '❓',
+    nome: 'Perguntas e Requer.',
+    nomeCompleto: 'Perguntas e Requerimentos',
+    icon: ChatBubbleLeftRightIcon,
+    cor: 'from-purple-400 to-fuchsia-500',
+    borderCor: 'border-purple-500',
+    bgCor: 'bg-purple-500/10',
+    shadowCor: 'shadow-purple-500/50',
+    textCor: 'text-purple-400',
+    url: 'https://www.parlamento.pt/ActividadeParlamentar/Paginas/PerguntasRequerimentos.aspx'
+  },
+  geral_votacoes: {
+    numero: '🗳️',
+    nome: 'Votações',
+    nomeCompleto: 'Arquivo de Votações',
+    icon: HandRaisedIcon,
+    cor: 'from-red-400 to-rose-500',
+    borderCor: 'border-red-500',
+    bgCor: 'bg-red-500/10',
+    shadowCor: 'shadow-red-500/50',
+    textCor: 'text-red-400',
+    url: 'https://www.parlamento.pt/ArquivoDocumentacao/Paginas/Arquivodevotacoes.aspx'
+  },
+  geral_sumulas: {
+    numero: '📋',
+    nome: 'Súmulas Conf. Líderes',
+    nomeCompleto: 'Súmulas da Conferência de Líderes',
+    icon: DocumentMagnifyingGlassIcon,
+    cor: 'from-amber-400 to-orange-500',
+    borderCor: 'border-amber-500',
+    bgCor: 'bg-amber-500/10',
+    shadowCor: 'shadow-amber-500/50',
+    textCor: 'text-amber-400',
+    url: 'https://www.parlamento.pt/ActividadeParlamentar/Paginas/Sumulas-Conferencia-Lideres.aspx'
   }
 };
 
@@ -205,6 +258,10 @@ export const TIPOS_CONTEUDO = {
   audiencia: { nome: 'Audiência', emoji: '👥', cor: 'bg-green-500' },
   iniciativa: { nome: 'Iniciativa', emoji: '📜', cor: 'bg-yellow-500' },
   peticao: { nome: 'Petição', emoji: '✍️', cor: 'bg-red-500' },
+  pergunta: { nome: 'Pergunta', emoji: '❓', cor: 'bg-purple-500' },
+  requerimento: { nome: 'Requerimento', emoji: '📝', cor: 'bg-indigo-500' },
+  votacao: { nome: 'Votação', emoji: '🗳️', cor: 'bg-red-500' },
+  sumula: { nome: 'Súmula', emoji: '📋', cor: 'bg-amber-500' },
   geral: { nome: 'Geral', emoji: '📄', cor: 'bg-gray-500' }
 };
 

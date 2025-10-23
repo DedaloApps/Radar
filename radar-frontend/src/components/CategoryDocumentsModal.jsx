@@ -266,28 +266,38 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                 </select>
               )}
 
-              <input
-                type="date"
-                value={dataInicio}
-                onChange={(e) => setDataInicio(e.target.value)}
-                className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                placeholder="De"
-              />
+              {/* Data Início */}
+              <div className="relative">
+                <label className="absolute -top-2 left-2 px-1 bg-slate-900 text-xs text-slate-500">
+                  De
+                </label>
+                <input
+                  type="date"
+                  value={dataInicio}
+                  onChange={(e) => setDataInicio(e.target.value)}
+                  className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                />
+              </div>
 
-              <input
-                type="date"
-                value={dataFim}
-                onChange={(e) => setDataFim(e.target.value)}
-                className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                placeholder="Até"
-              />
+              {/* Data Fim */}
+              <div className="relative">
+                <label className="absolute -top-2 left-2 px-1 bg-slate-900 text-xs text-slate-500">
+                  Até
+                </label>
+                <input
+                  type="date"
+                  value={dataFim}
+                  onChange={(e) => setDataFim(e.target.value)}
+                  className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                />
+              </div>
 
               {filtrosAtivos && (
                 <button
                   onClick={limparFiltros}
                   className="px-3 py-2 text-sm text-slate-400 hover:text-white transition-colors"
                 >
-                  Limpar
+                  Limpar filtros
                 </button>
               )}
             </div>
@@ -375,14 +385,22 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                         }}
                         className={`p-2 rounded-lg transition-all ${
                           eFavorito(doc.id)
-                            ? 'bg-amber-500/20 hover:bg-amber-500/30'
-                            : 'bg-slate-800 hover:bg-slate-700'
+                            ? "bg-amber-500/20 hover:bg-amber-500/30"
+                            : "bg-slate-800 hover:bg-slate-700"
                         }`}
-                        title={eFavorito(doc.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                        title={
+                          eFavorito(doc.id)
+                            ? "Remover dos favoritos"
+                            : "Adicionar aos favoritos"
+                        }
                       >
-                        <StarIcon className={`w-4 h-4 ${
-                          eFavorito(doc.id) ? 'text-amber-400 fill-amber-400' : 'text-slate-400'
-                        }`} />
+                        <StarIcon
+                          className={`w-4 h-4 ${
+                            eFavorito(doc.id)
+                              ? "text-amber-400 fill-amber-400"
+                              : "text-slate-400"
+                          }`}
+                        />
                       </button>
 
                       {/* Botão Arquivar/Restaurar */}
@@ -396,7 +414,7 @@ const CategoryDocumentsModal = ({ category, onClose, onSelectDocument }) => {
                           }
                         }}
                         className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-all"
-                        title={isArchived ? 'Restaurar' : 'Arquivar'}
+                        title={isArchived ? "Restaurar" : "Arquivar"}
                       >
                         {isArchived ? (
                           <EyeSlashIcon className="w-4 h-4 text-emerald-400" />

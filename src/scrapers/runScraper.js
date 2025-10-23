@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { testConnection } from '../config/supabase.js';
 import { scrapeTodasComissoes } from './comissoes.js';
+import { scrapeTodasPaginasGerais } from './paginasGerais.js';
 import { enviarNotificacoes } from '../services/emailService.js';
 
 export async function executarScraping() {
@@ -12,9 +13,14 @@ export async function executarScraping() {
     await testConnection();
     
     console.log('📡 Iniciando scraping das comissões...');
-    const totalNovos = await scrapeTodasComissoes();
+    const novosComissoes = await scrapeTodasComissoes();
     
-    console.log(`\n✅ Scraping concluído: ${totalNovos} novos documentos`);
+    console.log('\n📡 Iniciando scraping das páginas gerais...');
+    const novosPaginasGerais = await scrapeTodasPaginasGerais();
+    
+    const totalNovos = novosComissoes + novosPaginasGerais;
+    
+    console.log(`\n✅ Scraping concluído: ${totalNovos} novos documentos (${novosComissoes} comissões + ${novosPaginasGerais} páginas gerais)`);
     
     // Enviar notificações se houver novos documentos
     if (totalNovos > 0) {

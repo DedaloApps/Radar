@@ -35,6 +35,12 @@ const RadarFullScreen = ({ stats, documents }) => {
     1
   );
 
+  // Função para voltar do documento para a categoria
+  const handleBackToCategory = () => {
+    setSelectedDocument(null);
+    // selectedCategory já está definido, então o modal reaparece
+  };
+
   return (
     <>
       {/* FUNDO COMPLETO - Tech Grid */}
@@ -241,14 +247,14 @@ const RadarFullScreen = ({ stats, documents }) => {
         );
       })}
 
-      {/* Modal de Documentos da Categoria */}
-      {selectedCategory && (
+      {/* Modal de Documentos da Categoria - NÃO fecha quando abre documento */}
+      {selectedCategory && !selectedDocument && (
         <CategoryDocumentsModal
           category={selectedCategory}
           onClose={() => setSelectedCategory(null)}
           onSelectDocument={(doc) => {
             setSelectedDocument(doc);
-            setSelectedCategory(null);
+            // NÃO fechamos selectedCategory aqui!
           }}
         />
       )}
@@ -257,7 +263,11 @@ const RadarFullScreen = ({ stats, documents }) => {
       {selectedDocument && (
         <DocumentDetailModal
           document={selectedDocument}
-          onClose={() => setSelectedDocument(null)}
+          onClose={() => {
+            setSelectedDocument(null);
+            setSelectedCategory(null);
+          }}
+          onBack={selectedCategory ? handleBackToCategory : null}
         />
       )}
     </>
