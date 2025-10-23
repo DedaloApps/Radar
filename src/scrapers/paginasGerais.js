@@ -23,10 +23,16 @@ function limparUrl(urlRelativo) {
 function normalizarData(dataStr) {
   if (!dataStr) return new Date().toISOString().split("T")[0];
   
-  // Formatos possíveis: "DD-MM-YYYY", "DD/MM/YYYY", "DD.MM.YYYY"
-  const partes = dataStr.split(/[-/.]/);
-  if (partes.length === 3) {
-    const [dia, mes, ano] = partes;
+  // Formato: "22.10" + "2025" separado
+  const partes = dataStr.trim().split('.');
+  if (partes.length === 2) {
+    return partes; // Retorna [dia, mes] para combinar com ano
+  }
+  
+  // Formato completo: "DD.MM.YYYY", "DD-MM-YYYY", "DD/MM/YYYY"
+  const match = dataStr.match(/(\d{1,2})[\.\-\/](\d{1,2})[\.\-\/](\d{4})/);
+  if (match) {
+    const [_, dia, mes, ano] = match;
     return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
   }
   
@@ -51,32 +57,53 @@ async function scrapeUltimasIniciativas() {
     const $ = cheerio.load(response.data);
     const iniciativas = [];
 
-    // Procurar linhas de iniciativas
-    $(".iniciativa-row, tr").each((index, element) => {
+    // Procurar divs com classe "row home_calendar hc-detail"
+    $(".row.home_calendar.hc-detail").each((index, element) => {
       const $row = $(element);
       
-      // Tentar encontrar link da iniciativa
-      const link = $row.find('a[href*="DetalheIniciativa"]').first();
-      if (!link.length) return;
+      // Extrair data (dividida em dois <p>)
+      const dia_mes = $row.find('.col-xs-2 p.date').text().trim(); // "22.10"
+      const ano = $row.find('.col-xs-2 p.time').text().trim(); // "2025"
       
-      const titulo = link.text().trim();
+      // Extrair link e título
+      const link = $row.find('.col-xs-10 a').first();
+      const titulo_completo = link.find('p.title').text().trim(); // "Projeto de Lei 286/XVII/1 [PSD]"
       const url = link.attr("href");
       
-      // Extrair outros dados da linha
-      const tds = $row.find("td");
-      const tipo = tds.eq(0).text().trim();
-      const numero = tds.eq(1).text().trim();
-      const data = tds.eq(3).text().trim() || tds.eq(4).text().trim();
-      const autores = tds.eq(5).text().trim() || tds.eq(6).text().trim();
+      // Extrair descrição
+      const descricao = $row.find('.col-xs-10 p.desc').text().trim();
+      
+      // Extrair tipo e número do título
+      // Formato: "Projeto de Lei 286/XVII/1 [PSD]"
+      const match = titulo_completo.match(/^(.*?)\s+(\d+\/[^\s]+)\s*(?:\[(.*?)\])?/);
+      let tipo = "";
+      let numero = "";
+      let autores = "";
+      
+      if (match) {
+        tipo = match[1]; // "Projeto de Lei"
+        numero = match[2]; // "286/XVII/1"
+        autores = match[3] || ""; // "PSD"
+      }
+      
+      // Construir data completa
+      let data_publicacao = new Date().toISOString().split("T")[0];
+      if (dia_mes && ano) {
+        const [dia, mes] = dia_mes.split('.');
+        if (dia && mes) {
+          data_publicacao = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+        }
+      }
 
-      if (titulo && url) {
+      if (titulo_completo && url) {
         iniciativas.push({
           tipo_conteudo: "iniciativa",
           categoria: "geral_iniciativas",
-          titulo: titulo,
+          titulo: descricao || titulo_completo,
           numero: numero || null,
-          data_publicacao: normalizarData(data),
+          data_publicacao: data_publicacao,
           autores: autores || null,
+          resumo: descricao || titulo_completo,
           url: limparUrl(url),
           fonte: "parlamento",
         });
@@ -109,30 +136,52 @@ async function scrapePerguntasRequerimentos() {
     const $ = cheerio.load(response.data);
     const perguntas = [];
 
-    // Procurar linhas de perguntas/requerimentos
-    $("tr, .pergunta-row").each((index, element) => {
+    // Usar mesma estrutura
+    $(".row.home_calendar.hc-detail, tr").each((index, element) => {
       const $row = $(element);
       
-      const link = $row.find('a[href*="DetalheIniciativa"], a[href*="Detalhes"]').first();
-      if (!link.length) return;
+      // Tentar estrutura de div primeiro
+      let dia_mes = $row.find('.col-xs-2 p.date').text().trim();
+      let ano = $row.find('.col-xs-2 p.time').text().trim();
+      let link = $row.find('.col-xs-10 a').first();
+      let titulo = link.find('p.title').text().trim();
+      let descricao = $row.find('.col-xs-10 p.desc').text().trim();
+      let url = link.attr("href");
       
-      const titulo = link.text().trim();
-      const url = link.attr("href");
+      // Se não encontrou, tentar estrutura de tabela
+      if (!titulo) {
+        const tds = $row.find("td");
+        if (tds.length > 0) {
+          link = $row.find('a').first();
+          titulo = link.text().trim() || tds.eq(1).text().trim();
+          url = link.attr("href");
+          dia_mes = tds.eq(0).text().trim();
+          descricao = tds.eq(2).text().trim() || tds.eq(3).text().trim();
+        }
+      }
       
-      const tds = $row.find("td");
-      const tipo = tds.eq(0).text().trim();
-      const numero = tds.eq(1).text().trim();
-      const data = tds.eq(2).text().trim() || tds.eq(3).text().trim();
-      const autor = tds.eq(4).text().trim() || tds.eq(5).text().trim();
+      // Construir data
+      let data_publicacao = new Date().toISOString().split("T")[0];
+      if (dia_mes && ano) {
+        const [dia, mes] = dia_mes.split('.');
+        if (dia && mes) {
+          data_publicacao = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+        }
+      } else if (dia_mes) {
+        const partes = normalizarData(dia_mes);
+        if (typeof partes === 'string') data_publicacao = partes;
+      }
 
       if (titulo && url) {
+        // Determinar tipo
+        const tipo = titulo.toLowerCase().includes("pergunta") ? "pergunta" : "requerimento";
+        
         perguntas.push({
-          tipo_conteudo: tipo.toLowerCase().includes("pergunta") ? "pergunta" : "requerimento",
+          tipo_conteudo: tipo,
           categoria: "geral_perguntas",
-          titulo: titulo,
-          numero: numero || null,
-          data_publicacao: normalizarData(data),
-          autores: autor || null,
+          titulo: descricao || titulo,
+          data_publicacao: data_publicacao,
+          resumo: descricao || titulo,
           url: limparUrl(url),
           fonte: "parlamento",
         });
@@ -165,28 +214,47 @@ async function scrapeVotacoes() {
     const $ = cheerio.load(response.data);
     const votacoes = [];
 
-    // Procurar linhas de votações
-    $("tr, .votacao-row").each((index, element) => {
+    // Tentar mesma estrutura
+    $(".row.home_calendar.hc-detail, tr").each((index, element) => {
       const $row = $(element);
       
-      const link = $row.find('a[href*="DetalheVotacao"], a[href*="Votacao"]').first();
-      if (!link.length) return;
+      let dia_mes = $row.find('.col-xs-2 p.date').text().trim();
+      let ano = $row.find('.col-xs-2 p.time').text().trim();
+      let link = $row.find('.col-xs-10 a').first();
+      let titulo = link.find('p.title').text().trim();
+      let descricao = $row.find('.col-xs-10 p.desc').text().trim();
+      let url = link.attr("href");
       
-      const titulo = link.text().trim();
-      const url = link.attr("href");
+      // Fallback para tabela
+      if (!titulo) {
+        const tds = $row.find("td");
+        if (tds.length > 0) {
+          link = $row.find('a').first();
+          titulo = link.text().trim();
+          url = link.attr("href");
+          dia_mes = tds.eq(0).text().trim();
+          descricao = tds.eq(1).text().trim() || tds.eq(2).text().trim();
+        }
+      }
       
-      const tds = $row.find("td");
-      const data = tds.eq(0).text().trim() || tds.eq(1).text().trim();
-      const assunto = tds.eq(2).text().trim() || tds.eq(3).text().trim();
-      const resultado = tds.eq(4).text().trim() || tds.eq(5).text().trim();
+      let data_publicacao = new Date().toISOString().split("T")[0];
+      if (dia_mes && ano) {
+        const [dia, mes] = dia_mes.split('.');
+        if (dia && mes) {
+          data_publicacao = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+        }
+      } else if (dia_mes) {
+        const partes = normalizarData(dia_mes);
+        if (typeof partes === 'string') data_publicacao = partes;
+      }
 
       if (titulo && url) {
         votacoes.push({
           tipo_conteudo: "votacao",
           categoria: "geral_votacoes",
-          titulo: assunto || titulo,
-          data_publicacao: normalizarData(data),
-          estado: resultado || null,
+          titulo: descricao || titulo,
+          data_publicacao: data_publicacao,
+          resumo: descricao || titulo,
           url: limparUrl(url),
           fonte: "parlamento",
         });
@@ -219,37 +287,43 @@ async function scrapeSumulasConferencia() {
     const $ = cheerio.load(response.data);
     const sumulas = [];
 
-    // Procurar linhas de súmulas
-    $("tr, .sumula-row, a[href*='sumula'], a[href*='Sumula']").each((index, element) => {
+    $(".row.home_calendar.hc-detail, a[href*='pdf'], a[href*='doc']").each((index, element) => {
       const $element = $(element);
       
-      let link, titulo, url, data;
+      let dia_mes, ano, titulo, url, descricao;
       
-      if ($element.is('a')) {
-        link = $element;
-        titulo = link.text().trim();
+      if ($element.hasClass('row')) {
+        // Estrutura de div
+        dia_mes = $element.find('.col-xs-2 p.date').text().trim();
+        ano = $element.find('.col-xs-2 p.time').text().trim();
+        const link = $element.find('.col-xs-10 a').first();
+        titulo = link.find('p.title').text().trim();
         url = link.attr("href");
-        // Tentar extrair data do título ou do elemento pai
-        const textoCompleto = $element.parent().text();
-        const matchData = textoCompleto.match(/(\d{1,2}[-/.]\d{1,2}[-/.]\d{4})/);
-        data = matchData ? matchData[1] : "";
+        descricao = $element.find('.col-xs-10 p.desc').text().trim();
       } else {
-        link = $element.find('a[href*="pdf"], a[href*="doc"], a').first();
-        if (!link.length) return;
-        
-        titulo = link.text().trim();
-        url = link.attr("href");
-        
-        const tds = $element.find("td");
-        data = tds.eq(0).text().trim() || tds.eq(1).text().trim();
+        // Link direto
+        titulo = $element.text().trim();
+        url = $element.attr("href");
+        const parent = $element.closest('.row, tr');
+        dia_mes = parent.find('p.date, td').first().text().trim();
+        ano = parent.find('p.time').text().trim();
+      }
+      
+      let data_publicacao = new Date().toISOString().split("T")[0];
+      if (dia_mes && ano) {
+        const [dia, mes] = dia_mes.split('.');
+        if (dia && mes) {
+          data_publicacao = `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+        }
       }
 
-      if (titulo && url) {
+      if (titulo && url && (url.includes('pdf') || url.includes('doc'))) {
         sumulas.push({
           tipo_conteudo: "sumula",
           categoria: "geral_sumulas",
           titulo: titulo.startsWith("Súmula") ? titulo : `Súmula - ${titulo}`,
-          data_publicacao: normalizarData(data),
+          data_publicacao: data_publicacao,
+          resumo: descricao || titulo,
           url: limparUrl(url),
           fonte: "parlamento",
         });
@@ -298,11 +372,12 @@ export async function scrapeTodasPaginasGerais() {
       });
 
       novosGuardados++;
+      console.log(`    ✅ Novo: ${doc.titulo.substring(0, 60)}...`);
     } catch (error) {
       if (error.code === "23505" || error.message?.includes("duplicate key")) {
         duplicadosIgnorados++;
       } else {
-        console.error(`    ❌ Erro ao guardar "${doc.titulo}": ${error.message}`);
+        console.error(`    ❌ Erro ao guardar "${doc.titulo.substring(0, 40)}": ${error.message}`);
       }
     }
   }
