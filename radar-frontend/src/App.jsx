@@ -1,10 +1,9 @@
-// src/App.jsx (SUBSTITUIR)
+// src/App.jsx (ATUALIZAR - remover RadarNavigation)
 import { useState, useEffect } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { UserProvider, useUser } from "./contexts/UserContext";
+import { UserProvider } from "./contexts/UserContext";
 import { RadarProvider, useRadar } from "./contexts/Radarcontext";
 import Header from "./components/Header";
-import RadarNavigation from "./components/RadarNavigation";
 import RadarFullScreen from "./components/RadarFullScreen";
 import ConfigModal from "./components/ConfigModal";
 import AdminDashboard from "./components/AdminDashboard";
@@ -16,14 +15,13 @@ import DocumentDetailModal from "./components/DocumentDetailModal";
 
 function AppContent() {
   const { isAuthenticated, loading: authLoading, isAdmin } = useAuth();
-  const { radarAtivo, mudarRadar } = useRadar();
+  const { radarAtivo } = useRadar();
   const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
-  const { documentosFavoritos } = useUser();
 
   const { stats } = useStats(radarAtivo);
   const { documents, refetch } = useDocuments(radarAtivo);
@@ -75,30 +73,20 @@ function AppContent() {
           onOpenAdmin={isAdmin ? () => setIsAdminOpen(true) : null}
           onOpenFavorites={() => setMostrarFavoritos(true)}
           favoritesEnabled={mostrarFavoritos}
-          favoritesCount={documentosFavoritos.length}
           isRefreshing={isRefreshing}
         />
-
-        <div className="mt-4 flex justify-center">
-          <RadarNavigation 
-            activeRadar={radarAtivo} 
-            onChange={mudarRadar} 
-          />
-        </div>
       </div>
 
-      <div className="absolute inset-0 pt-40">
+      <div className="absolute inset-0 pt-32">
         <RadarFullScreen 
           stats={stats} 
           documents={documents}
-          radarAtivo={radarAtivo}
         />
       </div>
 
       <ConfigModal
         isOpen={isConfigOpen}
         onClose={() => setIsConfigOpen(false)}
-        radarAtivo={radarAtivo}
       />
 
       {mostrarFavoritos && (
@@ -109,7 +97,6 @@ function AppContent() {
             setMostrarFavoritos(false);
           }}
           allDocuments={documents}
-          radarAtivo={radarAtivo}
         />
       )}
 
@@ -117,7 +104,6 @@ function AppContent() {
         <DocumentDetailModal
           document={selectedDocument}
           onClose={() => setSelectedDocument(null)}
-          radarAtivo={radarAtivo}
         />
       )}
 

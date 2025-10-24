@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { testConnection } from '../config/supabase.js';
 import { scrapeTodasComissoes } from './comissoes.js';
 import { scrapeTodasPaginasGerais } from './paginasGerais.js';
-import { scrapeTodosStakeholders } from './Stakeholders.js'; // ← Lowercase 's'
+import { scrapeTodosStakeholders } from './stakeholders.js'; // ← Lowercase 's'
 import { enviarNotificacoes } from '../services/emailService.js';
 
 export async function executarScraping() {

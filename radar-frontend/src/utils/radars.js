@@ -1,4 +1,4 @@
-// src/utils/radars.js
+// src/utils/radars.js (CORRIGIR)
 import {
   ScaleIcon,
   UserGroupIcon,
@@ -10,13 +10,15 @@ import {
   TruckIcon,
 } from '@heroicons/react/24/solid';
 
-// ============================================
-// RADAR LEGISLATIVO (JÁ EXISTE)
-// ============================================
-export { COMISSOES } from './categories';
+import { COMISSOES } from './categories'; // ← CORRIGIDO: import em vez de require
 
 // ============================================
-// RADAR STAKEHOLDERS (NOVO)
+// RADAR LEGISLATIVO
+// ============================================
+// Removido: export { COMISSOES } from './categories';
+
+// ============================================
+// RADAR STAKEHOLDERS
 // ============================================
 export const STAKEHOLDERS = {
   concertacao_social: {
@@ -173,7 +175,7 @@ export const RADARS_CONFIG = {
       primaria: '#262261',
       secundaria: '#27aae2'
     },
-    categorias: 'COMISSOES',
+    categorias: COMISSOES, // ← CORRIGIDO: usar direto
     tiposConteudo: TIPOS_CONTEUDO_LEGISLATIVO
   },
   stakeholders: {
@@ -196,11 +198,7 @@ export const getRadarConfig = (radarId) => {
 
 export const getCategorias = (radarId) => {
   const config = getRadarConfig(radarId);
-  if (config.categorias === 'COMISSOES') {
-    const { COMISSOES } = require('./categories');
-    return COMISSOES;
-  }
-  return config.categorias;
+  return config.categorias || COMISSOES; // ← CORRIGIDO: retornar direto
 };
 
 export const getCategoriaInfo = (categoria, radarId = 'legislativo') => {
