@@ -135,6 +135,11 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // ✅ NOVA FUNÇÃO: Marcar como não lido
+  const marcarComoNaoLido = (documentoId) => {
+    setDocumentosLidos((prev) => prev.filter((id) => id !== documentoId));
+  };
+
   const foiLido = (documentoId) => {
     return documentosLidos.includes(documentoId);
   };
@@ -240,6 +245,7 @@ export const UserProvider = ({ children }) => {
         resetarPreferencias,
         documentosLidos,
         marcarComoLido,
+        marcarComoNaoLido, // ✅ NOVO
         foiLido,
         limparLidosAntigos,
         documentosArquivados,

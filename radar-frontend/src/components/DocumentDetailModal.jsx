@@ -42,18 +42,29 @@ const DocumentDetailModal = ({ document, onClose, onBack }) => {
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-3xl max-h-[90vh] bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col"
+        className="relative w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl border overflow-hidden flex flex-col"
+        style={{
+          backgroundColor: '#0f172a',
+          borderColor: 'rgba(100, 116, 139, 0.5)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Minimalista */}
-        <div className="relative border-b border-slate-700 bg-slate-900 flex-shrink-0">
+        {/* Header - ROXO/AZUL */}
+        <div className="relative border-b flex-shrink-0"
+             style={{
+               backgroundColor: 'rgba(38, 34, 97, 0.5)',
+               borderColor: 'rgba(100, 116, 139, 0.5)'
+             }}>
           <div className="p-6 pr-16 pl-16">
             <div className="flex items-center gap-4 mb-3">
-              <div className="p-3 bg-slate-800 rounded-xl">
-                <Icon className="w-6 h-6 text-emerald-400" />
+              {/* Ícone - AZUL */}
+              <div className="p-3 rounded-xl"
+                   style={{ backgroundColor: 'rgba(38, 34, 97, 0.8)' }}>
+                <Icon className="w-6 h-6" style={{ color: '#27aae2' }} />
               </div>
               <div className="flex-1">
-                <div className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">
+                <div className="text-xs font-medium uppercase tracking-wider mb-1"
+                     style={{ color: '#7dd3fc' }}>
                   {info.nomeCompleto || info.nome}
                 </div>
                 <h2 className="text-lg font-bold text-white line-clamp-2">
@@ -86,7 +97,7 @@ const DocumentDetailModal = ({ document, onClose, onBack }) => {
         {/* Conteúdo Scrollable */}
         <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: 'thin', scrollbarColor: '#334155 #1e293b' }}>
           
-          {/* Grid de Metadados */}
+          {/* Grid de Metadados - AZUL */}
           {metadados.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
               {metadados.map((meta, index) => {
@@ -94,10 +105,16 @@ const DocumentDetailModal = ({ document, onClose, onBack }) => {
                 return (
                   <div 
                     key={index}
-                    className="flex items-start gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700"
+                    className="flex items-start gap-3 p-3 rounded-lg border"
+                    style={{
+                      backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                      borderColor: 'rgba(100, 116, 139, 0.5)'
+                    }}
                   >
-                    <div className="p-2 bg-slate-700 rounded-lg flex-shrink-0">
-                      <MetaIcon className="w-4 h-4 text-slate-400" />
+                    {/* Ícone dos metadados - AZUL */}
+                    <div className="p-2 rounded-lg flex-shrink-0"
+                         style={{ backgroundColor: 'rgba(38, 34, 97, 0.5)' }}>
+                      <MetaIcon className="w-4 h-4" style={{ color: '#7dd3fc' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-xs text-slate-500 font-medium mb-0.5">
@@ -113,13 +130,18 @@ const DocumentDetailModal = ({ document, onClose, onBack }) => {
             </div>
           )}
 
-          {/* Entidades (se existir) */}
+          {/* Entidades */}
           {document.entidades && (
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-slate-400 mb-2">
+              <h4 className="text-sm font-semibold mb-2"
+                  style={{ color: '#7dd3fc' }}>
                 Entidades
               </h4>
-              <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+              <div className="p-4 rounded-lg border"
+                   style={{
+                     backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                     borderColor: 'rgba(100, 116, 139, 0.5)'
+                   }}>
                 <p className="text-sm text-slate-300 leading-relaxed">
                   {document.entidades}
                 </p>
@@ -130,10 +152,15 @@ const DocumentDetailModal = ({ document, onClose, onBack }) => {
           {/* Resumo */}
           {document.resumo && document.resumo !== document.titulo && (
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-slate-400 mb-2">
+              <h4 className="text-sm font-semibold mb-2"
+                  style={{ color: '#7dd3fc' }}>
                 Resumo
               </h4>
-              <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+              <div className="p-4 rounded-lg border"
+                   style={{
+                     backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                     borderColor: 'rgba(100, 116, 139, 0.5)'
+                   }}>
                 <p className="text-sm text-slate-300 leading-relaxed">
                   {document.resumo}
                 </p>
@@ -144,10 +171,17 @@ const DocumentDetailModal = ({ document, onClose, onBack }) => {
           {/* Conteúdo Completo */}
           {document.conteudo && (
             <div className="mb-6">
-              <h4 className="text-sm font-semibold text-slate-400 mb-2">
+              <h4 className="text-sm font-semibold mb-2"
+                  style={{ color: '#7dd3fc' }}>
                 Conteúdo Completo
               </h4>
-              <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 max-h-80 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#334155 #1e293b' }}>
+              <div className="p-4 rounded-lg border max-h-80 overflow-y-auto" 
+                   style={{ 
+                     backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                     borderColor: 'rgba(100, 116, 139, 0.5)',
+                     scrollbarWidth: 'thin', 
+                     scrollbarColor: '#334155 #1e293b' 
+                   }}>
                 <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
                   {document.conteudo}
                 </p>
@@ -156,20 +190,37 @@ const DocumentDetailModal = ({ document, onClose, onBack }) => {
           )}
 
           {/* Info Adicional */}
-          <div className="p-3 bg-slate-800/30 rounded-lg border border-slate-700/50">
+          <div className="p-3 rounded-lg border"
+               style={{
+                 backgroundColor: 'rgba(38, 34, 97, 0.3)',
+                 borderColor: 'rgba(100, 116, 139, 0.3)'
+               }}>
             <p className="text-xs text-slate-500 text-center">
               Fonte: <span className="text-slate-400 font-medium">{document.fonte === 'parlamento' ? 'Parlamento Português' : 'Diário da República'}</span>
             </p>
           </div>
         </div>
 
-        {/* Footer com Ação */}
-        <div className="border-t border-slate-700 bg-slate-900 p-4 flex-shrink-0">
+        {/* Footer com Ação - AZUL */}
+        <div className="border-t p-4 flex-shrink-0"
+             style={{
+               backgroundColor: 'rgba(38, 34, 97, 0.5)',
+               borderColor: 'rgba(100, 116, 139, 0.5)'
+             }}>
           <a
             href={document.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors group"
+            className="flex items-center justify-center gap-2 w-full py-3 text-white font-semibold rounded-lg transition-all group"
+            style={{ backgroundColor: '#27aae2' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#1e88b5';
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(39, 170, 226, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#27aae2';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             <span>Ver Documento Original</span>
             <ArrowTopRightOnSquareIcon className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

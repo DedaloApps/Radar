@@ -10,13 +10,12 @@ import {
   DocumentTextIcon,
   PencilSquareIcon,
   DocumentIcon,
-  QuestionMarkCircleIcon,  // ✅ NOVO - Para perguntas
-  DocumentMagnifyingGlassIcon,  // ✅ NOVO - Para requerimentos
-  HandRaisedIcon,  // ✅ NOVO - Para votações
-  DocumentChartBarIcon,  // ✅ NOVO - Para súmulas
+  QuestionMarkCircleIcon,
+  DocumentMagnifyingGlassIcon,
+  HandRaisedIcon,
+  DocumentChartBarIcon,
 } from '@heroicons/react/24/outline';
 
-// Mapear tipos de conteúdo para ícones
 const TIPO_ICONS = {
   agenda: CalendarIcon,
   audicao: MicrophoneIcon,
@@ -24,10 +23,10 @@ const TIPO_ICONS = {
   iniciativa: DocumentTextIcon,
   peticao: PencilSquareIcon,
   geral: DocumentIcon,
-  pergunta: QuestionMarkCircleIcon,  // ✅ NOVO
-  requerimento: DocumentMagnifyingGlassIcon,  // ✅ NOVO
-  votacao: HandRaisedIcon,  // ✅ NOVO
-  sumula: DocumentChartBarIcon,  // ✅ NOVO
+  pergunta: QuestionMarkCircleIcon,
+  requerimento: DocumentMagnifyingGlassIcon,
+  votacao: HandRaisedIcon,
+  sumula: DocumentChartBarIcon,
 };
 
 const ConfigModal = ({ isOpen, onClose }) => {
@@ -55,16 +54,24 @@ const ConfigModal = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-4xl max-h-[85vh] bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden"
+        className="relative w-full max-w-4xl max-h-[85vh] rounded-2xl shadow-2xl border overflow-hidden"
+        style={{
+          backgroundColor: '#0f172a',
+          borderColor: 'rgba(100, 116, 139, 0.5)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Minimalista */}
-        <div className="relative border-b border-slate-700 bg-slate-900">
+        {/* Header */}
+        <div className="relative border-b"
+             style={{
+               backgroundColor: 'rgba(38, 34, 97, 0.5)',
+               borderColor: 'rgba(100, 116, 139, 0.5)'
+             }}>
           <div className="p-6 pr-16">
             <h2 className="text-2xl font-bold text-white mb-1">
               Preferências
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm" style={{ color: '#7dd3fc' }}>
               Configura o que queres ver no radar
             </p>
           </div>
@@ -77,43 +84,44 @@ const ConfigModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Tabs Minimalistas */}
-        <div className="flex border-b border-slate-700 bg-slate-900/50">
+        {/* Tabs */}
+        <div className="flex border-b"
+             style={{
+               backgroundColor: 'rgba(38, 34, 97, 0.3)',
+               borderColor: 'rgba(100, 116, 139, 0.5)'
+             }}>
           <button
             onClick={() => setActiveTab('comissoes')}
             className={`flex-1 px-6 py-3 text-sm font-medium transition-colors relative ${
-              activeTab === 'comissoes'
-                ? 'text-white'
-                : 'text-slate-400 hover:text-slate-300'
+              activeTab === 'comissoes' ? 'text-white' : 'text-slate-400 hover:text-slate-300'
             }`}
           >
             Comissões
             {activeTab === 'comissoes' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5"
+                   style={{ backgroundColor: '#27aae2' }}></div>
             )}
           </button>
           <button
             onClick={() => setActiveTab('conteudos')}
             className={`flex-1 px-6 py-3 text-sm font-medium transition-colors relative ${
-              activeTab === 'conteudos'
-                ? 'text-white'
-                : 'text-slate-400 hover:text-slate-300'
+              activeTab === 'conteudos' ? 'text-white' : 'text-slate-400 hover:text-slate-300'
             }`}
           >
             Tipos de Conteúdo
             {activeTab === 'conteudos' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5"
+                   style={{ backgroundColor: '#27aae2' }}></div>
             )}
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(85vh-220px)]" style={{ scrollbarWidth: 'thin', scrollbarColor: '#334155 #1e293b' }}>
+        <div className="p-6 overflow-y-auto max-h-[calc(85vh-220px)]" 
+             style={{ scrollbarWidth: 'thin', scrollbarColor: '#334155 #1e293b' }}>
           
-          {/* Tab: Comissões */}
           {activeTab === 'comissoes' && (
             <div className="space-y-4">
-              {/* Search Bar */}
               <div className="flex items-center justify-between gap-4 mb-6">
                 <div className="flex-1 relative max-w-sm">
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -122,7 +130,9 @@ const ConfigModal = ({ isOpen, onClose }) => {
                     placeholder="Pesquisar..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none transition-colors"
+                    onFocus={(e) => e.target.style.borderColor = '#27aae2'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgb(51, 65, 85)'}
                   />
                 </div>
                 
@@ -131,7 +141,6 @@ const ConfigModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Lista de Comissões */}
               <div className="space-y-2">
                 {comissoesFiltradas.map(([id, info]) => {
                   const Icon = info.icon;
@@ -142,19 +151,20 @@ const ConfigModal = ({ isOpen, onClose }) => {
                       key={id}
                       onClick={() => toggleCategoria(id)}
                       className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-all ${
-                        isSelected
-                          ? 'bg-emerald-500/10 border-emerald-500/50 hover:bg-emerald-500/15'
-                          : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 hover:bg-slate-800'
+                        isSelected ? 'hover:opacity-90' : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 hover:bg-slate-800'
                       }`}
+                      style={isSelected ? {
+                        backgroundColor: 'rgba(39, 170, 226, 0.1)',
+                        borderColor: 'rgba(39, 170, 226, 0.5)'
+                      } : {}}
                     >
-                      {/* Icon */}
-                      <div className={`p-2 rounded-lg ${
-                        isSelected ? 'bg-emerald-500/20' : 'bg-slate-700'
-                      }`}>
-                        <Icon className={`w-5 h-5 ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`} />
+                      <div className="p-2 rounded-lg"
+                           style={isSelected ? {
+                             backgroundColor: 'rgba(39, 170, 226, 0.2)'
+                           } : { backgroundColor: 'rgb(51, 65, 85)' }}>
+                        <Icon className="w-5 h-5" style={{ color: isSelected ? '#27aae2' : '#94a3b8' }} />
                       </div>
 
-                      {/* Text */}
                       <div className="flex-1 text-left">
                         <div className={`font-medium text-sm ${isSelected ? 'text-white' : 'text-slate-300'}`}>
                           {info.numero} {info.nome}
@@ -164,15 +174,12 @@ const ConfigModal = ({ isOpen, onClose }) => {
                         </div>
                       </div>
 
-                      {/* Checkbox */}
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                        isSelected
-                          ? 'bg-emerald-500 border-emerald-500'
-                          : 'border-slate-600'
-                      }`}>
-                        {isSelected && (
-                          <CheckIcon className="w-3.5 h-3.5 text-white" />
-                        )}
+                      <div className="w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                           style={isSelected ? {
+                             backgroundColor: '#27aae2',
+                             borderColor: '#27aae2'
+                           } : { borderColor: 'rgb(75, 85, 99)' }}>
+                        {isSelected && <CheckIcon className="w-3.5 h-3.5 text-white" />}
                       </div>
                     </button>
                   );
@@ -187,10 +194,8 @@ const ConfigModal = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Tab: Tipos de Conteúdo */}
           {activeTab === 'conteudos' && (
             <div className="space-y-4">
-              {/* Counter */}
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-base font-semibold text-white mb-1">
@@ -206,41 +211,38 @@ const ConfigModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Grid de Tipos */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {Object.entries(TIPOS_CONTEUDO).map(([tipo, info]) => {
                   const isSelected = tiposConteudoVisiveis.includes(tipo);
-                  const IconComponent = TIPO_ICONS[tipo] || DocumentIcon; // Fallback para DocumentIcon
+                  const IconComponent = TIPO_ICONS[tipo] || DocumentIcon;
 
                   return (
                     <button
                       key={tipo}
                       onClick={() => toggleTipoConteudo(tipo)}
                       className={`relative p-4 rounded-lg border transition-all ${
-                        isSelected
-                          ? 'bg-emerald-500/10 border-emerald-500/50'
-                          : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 hover:bg-slate-800'
+                        isSelected ? '' : 'bg-slate-800/50 border-slate-700 hover:border-slate-600 hover:bg-slate-800'
                       }`}
+                      style={isSelected ? {
+                        backgroundColor: 'rgba(39, 170, 226, 0.1)',
+                        borderColor: 'rgba(39, 170, 226, 0.5)'
+                      } : {}}
                     >
-                      {/* Checkbox - Top Right */}
-                      <div className={`absolute top-3 right-3 w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${
-                        isSelected
-                          ? 'bg-emerald-500 border-emerald-500'
-                          : 'border-slate-600'
-                      }`}>
-                        {isSelected && (
-                          <CheckIcon className="w-3 h-3 text-white" />
-                        )}
+                      <div className="absolute top-3 right-3 w-4 h-4 rounded border-2 flex items-center justify-center transition-all"
+                           style={isSelected ? {
+                             backgroundColor: '#27aae2',
+                             borderColor: '#27aae2'
+                           } : { borderColor: 'rgb(75, 85, 99)' }}>
+                        {isSelected && <CheckIcon className="w-3 h-3 text-white" />}
                       </div>
 
-                      {/* Icon */}
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${
-                        isSelected ? 'bg-emerald-500/20' : 'bg-slate-700'
-                      }`}>
-                        <IconComponent className={`w-5 h-5 ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`} />
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
+                           style={isSelected ? {
+                             backgroundColor: 'rgba(39, 170, 226, 0.2)'
+                           } : { backgroundColor: 'rgb(51, 65, 85)' }}>
+                        <IconComponent className="w-5 h-5" style={{ color: isSelected ? '#27aae2' : '#94a3b8' }} />
                       </div>
 
-                      {/* Nome */}
                       <div className={`font-medium text-sm ${isSelected ? 'text-white' : 'text-slate-300'}`}>
                         {info.nome}
                       </div>
@@ -253,9 +255,12 @@ const ConfigModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-700 bg-slate-900 p-4">
+        <div className="border-t p-4"
+             style={{
+               backgroundColor: 'rgba(38, 34, 97, 0.5)',
+               borderColor: 'rgba(100, 116, 139, 0.5)'
+             }}>
           <div className="flex items-center justify-between gap-3">
-            {/* Reset */}
             <button
               onClick={resetarPreferencias}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
@@ -264,10 +269,18 @@ const ConfigModal = ({ isOpen, onClose }) => {
               Restaurar
             </button>
 
-            {/* Save */}
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-6 py-2 text-white text-sm font-medium rounded-lg transition-all"
+              style={{ backgroundColor: '#27aae2' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1e88b5';
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(39, 170, 226, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#27aae2';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             >
               Guardar
             </button>

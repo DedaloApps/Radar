@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { getCategoriaInfo } from "../utils/categories";
+import { getCategorias } from "../utils/radars"; // ← NOVO
 import { BoltIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useUser } from "../contexts/UserContext";
+import { useRadar } from "../contexts/RadarContext"; // ← NOVO
 import DocumentDetailModal from "./DocumentDetailModal";
 import CategoryDocumentsModal from "./CategoryDocumentsModal";
 
@@ -10,10 +12,16 @@ const RadarFullScreen = ({ stats, documents }) => {
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const { categoriasFavoritas, tiposConteudoVisiveis, foiLido } = useUser();
+  const { categoriasFavoritas, tiposConteudoVisiveis, foiLido, estaArquivado } = useUser();
+  const { radarAtivo } = useRadar(); // ← NOVO
 
-  // Filtrar apenas categorias favoritas
-  const categoriasList = categoriasFavoritas;
+  // Obter categorias do radar ativo ← NOVO
+  const categoriasDoRadar = getCategorias(radarAtivo);
+
+  // Filtrar apenas categorias favoritas que existem no radar atual
+  const categoriasList = categoriasFavoritas.filter(cat => 
+    Object.keys(categoriasDoRadar).includes(cat)
+  );
   const angleStep = 360 / categoriasList.length;
 
   // Filtrar documentos por tipo de conteúdo visível
@@ -27,7 +35,9 @@ const RadarFullScreen = ({ stats, documents }) => {
     const categoryDocs = documentosFiltrados.filter(
       (d) => d.categoria === categoria
     );
-    return { total, documents: categoryDocs };
+    // ✅ NOVO: Contar apenas documentos não arquivados
+    const activeCount = categoryDocs.filter((doc) => !estaArquivado(doc.id)).length;
+    return { total, documents: categoryDocs, activeCount };
   };
 
   const maxValue = Math.max(
@@ -109,8 +119,8 @@ const RadarFullScreen = ({ stats, documents }) => {
         {/* Linhas radiais */}
         {categoriasList.map((_, index) => {
           const angle = (angleStep * index - 90) * (Math.PI / 180);
-          const x = `${50 + Math.cos(angle) * 35}%`; {/* ALTERADO: 45 -> 35 */}
-          const y = `${50 + Math.sin(angle) * 35}%`; {/* ALTERADO: 45 -> 35 */}
+          const x = `${50 + Math.cos(angle) * 35}%`;
+          const y = `${50 + Math.sin(angle) * 35}%`;
           return (
             <line
               key={index}
@@ -140,30 +150,38 @@ const RadarFullScreen = ({ stats, documents }) => {
               <div className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">
                 Total
               </div>
-              <div className="mt-2 flex items-center justify-center gap-1.5 text-slate-400">
-                <BoltIcon className="w-3.5 h-3.5" />
-                <span className="text-xs font-medium">
-                  {stats.documentosHoje || 0}
-                </span>
-              </div>
+              {/* Documentos de Hoje - Elegante */}
+              {stats.documentosHoje > 0 && (
+                <div className="mt-3 pt-3 border-t border-slate-700/50">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">
+                      Hoje
+                    </span>
+                    <span className="text-xs font-bold text-white">
+                      {stats.documentosHoje}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* CATEGORIAS - Cards Minimalistas */}
+      {/* CATEGORIAS - Cards Redesenhados: Ícone + Título */}
       {categoriasList.map((categoria, index) => {
         const angle = (angleStep * index - 90) * (Math.PI / 180);
-        const info = getCategoriaInfo(categoria);
-        const { total, documents: categoryDocs } = getCategoryData(categoria);
+        const info = categoriasDoRadar[categoria] || getCategoriaInfo(categoria, radarAtivo); // ← ATUALIZADO
+        const { total, documents: categoryDocs, activeCount } = getCategoryData(categoria);
         const Icon = info.icon;
 
-        const radius = 35; {/* ALTERADO: 40 -> 35 */}
+        const radius = 35;
         const x = 50 + Math.cos(angle) * radius;
         const y = 50 + Math.sin(angle) * radius;
 
         const isHovered = hoveredCategory === categoria;
-        const hasNew = categoryDocs.some((doc) => !foiLido(doc.id));
+        const hasNew = categoryDocs.some((doc) => !foiLido(doc.id) && !estaArquivado(doc.id));
 
         return (
           <div
@@ -191,44 +209,52 @@ const RadarFullScreen = ({ stats, documents }) => {
                 }`}
               ></div>
 
-              {/* Card */}
+              {/* Card - NOVO LAYOUT COM NÚMERO */}
               <div
                 className={`relative bg-slate-900/90 backdrop-blur-xl rounded-2xl border transition-all ${
                   isHovered
                     ? "border-emerald-500/50 shadow-2xl shadow-emerald-500/20"
                     : "border-slate-700/50 shadow-xl"
                 }`}
-                style={{ minWidth: "160px" }}
+                style={{ width: "140px" }}
               >
                 {/* Notification Badge */}
                 {hasNew && (
                   <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 rounded-full border-2 border-slate-900 animate-pulse shadow-lg shadow-red-500/50"></div>
                 )}
 
-                <div className="p-4">
-                  {/* Icon + Number */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-2 bg-slate-800 rounded-lg">
-                      <Icon className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <div className="text-3xl font-black text-white">
-                      {total}
-                    </div>
+                {/* ✅ NOVO: Badge com número de documentos ativos */}
+                {activeCount > 0 && (
+                  <div className="absolute -top-2 -left-2 min-w-[24px] h-6 px-2 bg-emerald-500 rounded-full border-2 border-slate-900 flex items-center justify-center">
+                    <span className="text-xs font-bold text-white">
+                      {activeCount}
+                    </span>
+                  </div>
+                )}
+
+                <div className="p-4 flex flex-col items-center">
+                  {/* LINHA 1: Ícone grande ao centro */}
+                  <div className={`p-3 rounded-xl mb-3 transition-all ${
+                    isHovered ? 'bg-emerald-500/20' : 'bg-slate-800'
+                  }`}>
+                    <Icon className={`w-8 h-8 transition-colors ${
+                      isHovered ? 'text-emerald-400' : 'text-slate-400'
+                    }`} />
                   </div>
 
-                  {/* Nome */}
-                  <div className="text-sm font-semibold text-slate-300 mb-2 line-clamp-2">
+                  {/* LINHA 2: Título da categoria */}
+                  <div className={`text-xs font-semibold text-center line-clamp-2 transition-colors ${
+                    isHovered ? 'text-white' : 'text-slate-300'
+                  }`}>
                     {info.nome}
                   </div>
 
-                  {/* REMOVIDO: Progress Bar */}
-
                   {/* Ver Mais - Aparece no hover */}
                   {isHovered && categoryDocs.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-slate-700/50">
-                      <div className="flex items-center justify-between text-xs text-emerald-400 font-medium">
-                        <span>Ver documentos</span>
-                        <ChevronRightIcon className="w-4 h-4" />
+                    <div className="mt-3 pt-3 border-t border-slate-700/50 w-full">
+                      <div className="flex items-center justify-center gap-1 text-xs text-emerald-400 font-medium">
+                        <span>Ver</span>
+                        <ChevronRightIcon className="w-3 h-3" />
                       </div>
                     </div>
                   )}
