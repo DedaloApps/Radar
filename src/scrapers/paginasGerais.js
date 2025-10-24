@@ -72,7 +72,6 @@ async function scrapeUltimasIniciativas() {
     const $ = cheerio.load(response.data);
     const iniciativas = [];
 
-    // Tentar múltiplos seletores
     const selectores = [
       ".row.home_calendar.hc-detail",
       ".iniciativa-item",
@@ -92,24 +91,19 @@ async function scrapeUltimasIniciativas() {
         elementos.each((index, element) => {
           const $row = $(element);
           
-          // Tentar extrair link de várias formas
           const link = $row.find('a[href*="DetalheIniciativa"], a[href*="Iniciativa"], a').first();
           const url = link.attr("href");
           
-          // Extrair título
           let titulo = link.text().trim() || 
                       $row.find('.title, .titulo, h3, h4').text().trim() ||
                       $row.find('p').first().text().trim();
           
-          // Extrair descrição
           const descricao = $row.find('.desc, .descricao, p.desc').text().trim() ||
                            $row.find('p').last().text().trim();
           
-          // Extrair data
           let dataTexto = $row.find('.date, .data, time').text().trim();
           const dataCompleta = normalizarData(dataTexto);
           
-          // Extrair número e tipo
           const match = titulo.match(/^(.*?)\s+(\d+\/[^\s]+)/);
           let tipo = "";
           let numero = "";
@@ -119,7 +113,6 @@ async function scrapeUltimasIniciativas() {
             tipo = match[1].trim();
             numero = match[2].trim();
             
-            // Procurar autores entre []
             const autoresMatch = titulo.match(/\[(.*?)\]/);
             if (autoresMatch) {
               autores = autoresMatch[1].trim();
@@ -178,7 +171,7 @@ async function scrapeUltimasIniciativas() {
   }
 }
 
-// 2. PERGUNTAS E REQUERIMENTOS
+// 2. PERGUNTAS E REQUERIMENTOS - COM DEBUG
 async function scrapePerguntasRequerimentos() {
   console.log("\n🔍 Scraping Perguntas e Requerimentos...");
   
@@ -196,12 +189,20 @@ async function scrapePerguntasRequerimentos() {
     const $ = cheerio.load(response.data);
     const perguntas = [];
 
-    // Estrutura: <div class="row margin_h0 margin-Top-15"> com colunas para Tipo, Número, Data, Título
-    $(".row.margin_h0.margin-Top-15").each((index, element) => {
+    console.log(`  🔍 DEBUG: Procurando elementos com .row.margin_h0.margin-Top-15`);
+    const rows = $(".row.margin_h0.margin-Top-15");
+    console.log(`  📊 DEBUG: Encontrados ${rows.length} elementos`);
+
+    rows.each((index, element) => {
       const $row = $(element);
       
       const colunas = $row.find('.col-xs-12');
-      if (colunas.length < 4) return;
+      console.log(`  🔍 DEBUG Row ${index}: ${colunas.length} colunas`);
+      
+      if (colunas.length < 4) {
+        console.log(`  ⏭️ DEBUG Row ${index}: Skip - menos de 4 colunas`);
+        return;
+      }
       
       let tipo = "";
       let numero = "";
@@ -226,9 +227,13 @@ async function scrapePerguntasRequerimentos() {
         }
       });
       
+      console.log(`  🔍 DEBUG Row ${index}: tipo="${tipo}", numero="${numero}", data="${data}", titulo="${titulo?.substring(0, 30)}..."`);
+      
       if (titulo && url) {
         const tipoConteudo = tipo.toLowerCase().includes("pergunta") ? "pergunta" : "requerimento";
         const dataCompleta = normalizarData(data);
+        
+        console.log(`  ✅ DEBUG Row ${index}: Adicionando documento`);
         
         perguntas.push({
           tipo_conteudo: tipoConteudo,
@@ -240,6 +245,8 @@ async function scrapePerguntasRequerimentos() {
           url: limparUrl(url),
           fonte: "parlamento",
         });
+      } else {
+        console.log(`  ❌ DEBUG Row ${index}: Falta título ou URL`);
       }
     });
 
@@ -251,7 +258,7 @@ async function scrapePerguntasRequerimentos() {
   }
 }
 
-// 3. VOTAÇÕES
+// 3. VOTAÇÕES - COM DEBUG
 async function scrapeVotacoes() {
   console.log("\n🔍 Scraping Votações...");
   
@@ -269,24 +276,22 @@ async function scrapeVotacoes() {
     const $ = cheerio.load(response.data);
     const votacoes = [];
 
-    // Estrutura: <div class="row home_calendar hc-detail">
-    //   <div class="col-xs-2"><p class="date">17.10</p><p class="time">2025</p></div>
-    //   <div class="col-xs-10"><a href="..."><p class="title">Resultado das votações</p></a></div>
-    // </div>
+    console.log(`  🔍 DEBUG: Procurando elementos com .row.home_calendar.hc-detail`);
+    const rows = $(".row.home_calendar.hc-detail");
+    console.log(`  📊 DEBUG: Encontrados ${rows.length} elementos`);
 
-    $(".row.home_calendar.hc-detail").each((index, element) => {
+    rows.each((index, element) => {
       const $row = $(element);
       
-      // Extrair data (dia.mes + ano)
-      const dia_mes = $row.find('.col-xs-2 p.date').text().trim(); // "17.10"
-      const ano = $row.find('.col-xs-2 p.time').text().trim(); // "2025"
+      const dia_mes = $row.find('.col-xs-2 p.date').text().trim();
+      const ano = $row.find('.col-xs-2 p.time').text().trim();
       
-      // Extrair link e título
       const link = $row.find('.col-xs-10 a').first();
       const titulo = link.find('p.title').text().trim() || link.text().trim();
       const url = link.attr("href");
       
-      // Construir data completa
+      console.log(`  🔍 DEBUG Row ${index}: dia_mes="${dia_mes}", ano="${ano}", titulo="${titulo?.substring(0, 30)}..."`);
+      
       let data_publicacao = new Date().toISOString().split("T")[0];
       if (dia_mes && ano) {
         const [dia, mes] = dia_mes.split('.');
@@ -296,6 +301,8 @@ async function scrapeVotacoes() {
       }
 
       if (titulo && url) {
+        console.log(`  ✅ DEBUG Row ${index}: Adicionando votação`);
+        
         votacoes.push({
           tipo_conteudo: "votacao",
           categoria: "geral_votacoes",
@@ -305,6 +312,8 @@ async function scrapeVotacoes() {
           url: limparUrl(url),
           fonte: "parlamento",
         });
+      } else {
+        console.log(`  ❌ DEBUG Row ${index}: Falta título ou URL`);
       }
     });
 
@@ -316,7 +325,7 @@ async function scrapeVotacoes() {
   }
 }
 
-// 4. SÚMULAS DA CONFERÊNCIA DE LÍDERES
+// 4. SÚMULAS - COM DEBUG
 async function scrapeSumulasConferencia() {
   console.log("\n🔍 Scraping Súmulas da Conferência de Líderes...");
   
@@ -334,19 +343,28 @@ async function scrapeSumulasConferencia() {
     const $ = cheerio.load(response.data);
     const sumulas = [];
 
-    // Buscar links para PDFs e DOCs
-    $('a[href*=".pdf"], a[href*=".doc"], a[href*="sumula"], a[href*="Sumula"]').each((index, element) => {
+    console.log(`  🔍 DEBUG: Procurando links com .pdf, .doc, sumula`);
+    const links = $('a[href*=".pdf"], a[href*=".doc"], a[href*="sumula"], a[href*="Sumula"]');
+    console.log(`  📊 DEBUG: Encontrados ${links.length} links`);
+
+    links.each((index, element) => {
       const $link = $(element);
       const url = $link.attr("href");
       const titulo = $link.text().trim();
       
-      if (!titulo || !url) return;
+      console.log(`  🔍 DEBUG Link ${index}: titulo="${titulo?.substring(0, 30)}...", url="${url?.substring(0, 50)}..."`);
       
-      // Tentar encontrar data próxima
+      if (!titulo || !url) {
+        console.log(`  ❌ DEBUG Link ${index}: Falta título ou URL`);
+        return;
+      }
+      
       const $parent = $link.closest('.row, tr, article, li');
       const dataTexto = $parent.find('.date, .data, time').first().text().trim() ||
                        $parent.find('td').first().text().trim();
       const dataCompleta = normalizarData(dataTexto);
+      
+      console.log(`  ✅ DEBUG Link ${index}: Adicionando súmula`);
       
       sumulas.push({
         tipo_conteudo: "sumula",
@@ -372,7 +390,6 @@ export async function scrapeTodasPaginasGerais() {
   console.log("\n🚀 ========== SCRAPING DAS PÁGINAS GERAIS ==========");
   const inicio = Date.now();
 
-  // Executar todos os scrapers
   const [iniciativas, perguntas, votacoes, sumulas] = await Promise.all([
     scrapeUltimasIniciativas(),
     scrapePerguntasRequerimentos(),
@@ -389,7 +406,6 @@ export async function scrapeTodasPaginasGerais() {
 
   console.log(`\n📦 Total de documentos a processar: ${todosDocumentos.length}`);
 
-  // Guardar na base de dados
   let novosGuardados = 0;
   let duplicadosIgnorados = 0;
   let erros = 0;
