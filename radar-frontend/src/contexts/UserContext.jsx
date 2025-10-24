@@ -33,7 +33,18 @@ export const UserProvider = ({ children }) => {
     const saved = localStorage.getItem("radar_tipos_conteudo");
     return saved
       ? JSON.parse(saved)
-      : ["agenda", "audicao", "audiencia", "iniciativa", "peticao", "geral"];
+      : [
+          "agenda",
+          "audicao",
+          "audiencia",
+          "iniciativa",
+          "peticao",
+          "geral",
+          "pergunta",      // ✅ NOVO
+          "requerimento",  // ✅ NOVO
+          "votacao",       // ✅ NOVO
+          "sumula",        // ✅ NOVO
+        ];
   });
 
   // Estado para documentos lidos
@@ -110,6 +121,10 @@ export const UserProvider = ({ children }) => {
       "iniciativa",
       "peticao",
       "geral",
+      "pergunta",      // ✅ NOVO
+      "requerimento",  // ✅ NOVO
+      "votacao",       // ✅ NOVO
+      "sumula",        // ✅ NOVO
     ]);
   };
 
@@ -227,17 +242,17 @@ export const UserProvider = ({ children }) => {
         marcarComoLido,
         foiLido,
         limparLidosAntigos,
-        documentosArquivados, // ← NOVO
-        arquivarDocumento, // ← NOVO
-        restaurarDocumento, // ← NOVO
-        estaArquivado, // ← NOVO
-        limparArquivados, // ← NOVO
-        documentosFavoritos, // ← NOVO
-        adicionarFavorito, // ← NOVO
-        removerFavorito, // ← NOVO
-        toggleFavorito, // ← NOVO
-        eFavorito, // ← NOVO
-        limparFavoritos, // ← NOVO
+        documentosArquivados,
+        arquivarDocumento,
+        restaurarDocumento,
+        estaArquivado,
+        limparArquivados,
+        documentosFavoritos,
+        adicionarFavorito,
+        removerFavorito,
+        toggleFavorito,
+        eFavorito,
+        limparFavoritos,
       }}
     >
       {children}

@@ -9,7 +9,11 @@ import {
   UserGroupIcon,
   DocumentTextIcon,
   PencilSquareIcon,
-  DocumentIcon
+  DocumentIcon,
+  QuestionMarkCircleIcon,  // ✅ NOVO - Para perguntas
+  DocumentMagnifyingGlassIcon,  // ✅ NOVO - Para requerimentos
+  HandRaisedIcon,  // ✅ NOVO - Para votações
+  DocumentChartBarIcon,  // ✅ NOVO - Para súmulas
 } from '@heroicons/react/24/outline';
 
 // Mapear tipos de conteúdo para ícones
@@ -19,7 +23,11 @@ const TIPO_ICONS = {
   audiencia: UserGroupIcon,
   iniciativa: DocumentTextIcon,
   peticao: PencilSquareIcon,
-  geral: DocumentIcon
+  geral: DocumentIcon,
+  pergunta: QuestionMarkCircleIcon,  // ✅ NOVO
+  requerimento: DocumentMagnifyingGlassIcon,  // ✅ NOVO
+  votacao: HandRaisedIcon,  // ✅ NOVO
+  sumula: DocumentChartBarIcon,  // ✅ NOVO
 };
 
 const ConfigModal = ({ isOpen, onClose }) => {
@@ -202,7 +210,7 @@ const ConfigModal = ({ isOpen, onClose }) => {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {Object.entries(TIPOS_CONTEUDO).map(([tipo, info]) => {
                   const isSelected = tiposConteudoVisiveis.includes(tipo);
-                  const IconComponent = TIPO_ICONS[tipo];
+                  const IconComponent = TIPO_ICONS[tipo] || DocumentIcon; // Fallback para DocumentIcon
 
                   return (
                     <button
