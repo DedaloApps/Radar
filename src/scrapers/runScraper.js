@@ -1,8 +1,9 @@
+// backend/scrapers/runScraper.js (SUBSTITUIR - só mudou o import)
 import 'dotenv/config';
 import { testConnection } from '../config/supabase.js';
 import { scrapeTodasComissoes } from './comissoes.js';
 import { scrapeTodasPaginasGerais } from './paginasGerais.js';
-import { scrapeTodosStakeholders } from './Stakeholders.js';
+import { scrapeTodosStakeholders } from './Stakeholders.js'; // ← Lowercase 's'
 import { enviarNotificacoes } from '../services/emailService.js';
 
 export async function executarScraping() {
@@ -13,7 +14,6 @@ export async function executarScraping() {
     console.log('🔄 Conectando ao Supabase...');
     await testConnection();
     
-    // RADAR LEGISLATIVO
     console.log('\n📡 ===== RADAR LEGISLATIVO =====');
     console.log('📡 Scraping das comissões...');
     const novosComissoes = await scrapeTodasComissoes();
@@ -23,11 +23,9 @@ export async function executarScraping() {
     
     const totalLegislativo = novosComissoes + novosPaginasGerais;
     
-    // RADAR STAKEHOLDERS
     console.log('\n📡 ===== RADAR STAKEHOLDERS =====');
     const totalStakeholders = await scrapeTodosStakeholders();
     
-    // TOTAIS
     const totalGeral = totalLegislativo + totalStakeholders;
     
     console.log('\n\n📊 ========== RESUMO FINAL ==========');
@@ -36,7 +34,6 @@ export async function executarScraping() {
     console.log(`─────────────────────────────────────`);
     console.log(`TOTAL GERAL: ${totalGeral} novos documentos`);
     
-    // Enviar notificações se houver novos documentos
     if (totalGeral > 0) {
       console.log('\n📧 Enviando notificações por email...');
       await enviarNotificacoes();
@@ -57,7 +54,6 @@ export async function executarScraping() {
   }
 }
 
-// Executar se chamado diretamente
 if (import.meta.url === `file://${process.argv[1]}`) {
   executarScraping()
     .then((total) => {

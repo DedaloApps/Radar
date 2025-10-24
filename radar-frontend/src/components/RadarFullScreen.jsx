@@ -3,7 +3,7 @@ import { getCategoriaInfo } from "../utils/categories";
 import { getCategorias } from "../utils/radars"; // ← NOVO
 import { BoltIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useUser } from "../contexts/UserContext";
-import { useRadar } from "../contexts/RadarContext"; // ← NOVO
+import { useRadar } from "../contexts/Radarcontext"; // ← NOVO
 import DocumentDetailModal from "./DocumentDetailModal";
 import CategoryDocumentsModal from "./CategoryDocumentsModal";
 

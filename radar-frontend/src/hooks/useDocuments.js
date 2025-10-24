@@ -1,60 +1,52 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getDocuments, searchDocuments } from '../services/api';
+// src/hooks/useDocuments.js (SUBSTITUIR COMPLETAMENTE)
+import { useState, useEffect } from 'react';
+import { supabase } from '../config/supabase';
 
-export const useDocuments = () => {
+export const useDocuments = (tipoRadar = 'legislativo') => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategoria, setSelectedCategoria] = useState('todas');
-  const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchDocuments = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
+  const fetchDocuments = async () => {
     try {
-      let data;
+      setLoading(true);
       
-      if (searchQuery) {
-        data = await searchDocuments(searchQuery);
-      } else {
-        const params = {};
-        if (selectedCategoria !== 'todas') {
-          params.categoria = selectedCategoria;
-        }
-        data = await getDocuments(params);
-      }
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('tipo_radar', tipoRadar)
+        .order('data_publicacao', { ascending: false })
+        .order('created_at', { ascending: false });
 
-      setDocuments(data.data || []);
+      if (error) throw error;
+
+      console.log(`📊 Documentos do radar ${tipoRadar}:`, data?.length || 0);
+      setDocuments(data || []);
+      setError(null);
     } catch (err) {
+      console.error('❌ Erro ao buscar documentos:', err);
       setError(err.message);
-      console.error('Erro ao buscar documentos:', err);
     } finally {
       setLoading(false);
     }
-  }, [selectedCategoria, searchQuery]);
+  };
 
   useEffect(() => {
     fetchDocuments();
-  }, [fetchDocuments]);
+  }, [tipoRadar]);
 
-  // Auto-refresh a cada 5 minutos
   useEffect(() => {
     const interval = setInterval(() => {
       fetchDocuments();
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [fetchDocuments]);
+  }, [tipoRadar]);
 
   return {
     documents,
     loading,
     error,
-    selectedCategoria,
-    setSelectedCategoria,
-    searchQuery,
-    setSearchQuery,
     refetch: fetchDocuments
   };
 };

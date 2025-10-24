@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { BellIcon as BellSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
-import { useRadar } from '../contexts/RadarContext';
+import { useRadar } from '../contexts/Radarcontext';
 import { RADARS_CONFIG } from '../utils/radars';
 
 const Header = ({ 
