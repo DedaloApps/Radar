@@ -1,6 +1,6 @@
 // src/hooks/useDocuments.js (SUBSTITUIR COMPLETAMENTE)
 import { useState, useEffect } from 'react';
-import { supabase } from '../config/supabase';
+import { supabase } from '../../../src/config/supabase';
 
 export const useDocuments = (tipoRadar = 'legislativo') => {
   const [documents, setDocuments] = useState([]);
