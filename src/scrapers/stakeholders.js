@@ -9,37 +9,84 @@ const STAKEHOLDERS_CONFIG = {
   // CONCERTAÇÃO SOCIAL
   cgtp: {
     url: "https://www.cgtp.pt/accao-e-luta",
-    nome: "CGTP",
+    rss: "https://www.cgtp.pt/rss.xml", // Tentar RSS primeiro
+    nome: "CGTP-IN",
     categoria: "concertacao_social",
-    seletor: ".entry-title a", // Ajustar conforme HTML real
+    // Múltiplos seletores como fallback
+    seletores: [
+      ".entry-title a",
+      "article h2 a",
+      ".post-title a",
+      "h2 a[href*='/accao-e-luta/']",
+      ".content-item a",
+      "a[href*='/accao-e-luta/']"
+    ],
+    seletorData: ".entry-date, .post-date, time, .published",
+    seletorResumo: ".entry-summary, .entry-content, .excerpt, p",
     tipo_conteudo: "noticia",
   },
   ugt: {
     url: "https://www.ugt.pt/noticias",
+    rss: "https://www.ugt.pt/feed", // Tentar RSS
     nome: "UGT",
-    categoria: "stake_concertacao",
-    seletor: ".col-4 a[href*='/noticias/artigo/']", // ← CORRIGIDO
+    categoria: "concertacao_social",
+    seletores: [
+      ".col-4 a[href*='/noticias/artigo/']",
+      "article a[href*='/noticias/']",
+      ".news-item a",
+      ".noticia-titulo a",
+      "h3 a, h2 a"
+    ],
+    seletorData: ".data, .date, time, .published",
+    seletorResumo: ".resumo, .excerpt, p",
     tipo_conteudo: "noticia",
   },
   cap: {
     url: "https://www.cap.pt/noticias-cap",
+    rss: "https://www.cap.pt/feed", // Tentar RSS
     nome: "CAP",
     categoria: "concertacao_social",
-    seletor: ".noticia-titulo a",
+    seletores: [
+      ".noticia-titulo a",
+      "article h2 a",
+      ".news-title a",
+      "h3 a[href*='/noticias-']",
+      ".content-item a"
+    ],
+    seletorData: ".data, .date, time, .published",
+    seletorResumo: ".noticia-resumo, .excerpt, p",
     tipo_conteudo: "noticia",
   },
   ccp: {
     url: "https://ccp.pt/noticias/",
+    rss: "https://ccp.pt/feed", // Tentar RSS
     nome: "CCP",
     categoria: "concertacao_social",
-    seletor: ".post-title a",
+    seletores: [
+      ".post-title a",
+      "article h2 a",
+      ".entry-title a",
+      "h2 a[href*='/noticias/']",
+      ".news-item a"
+    ],
+    seletorData: ".post-date, .entry-date, time, .published",
+    seletorResumo: ".post-excerpt, .entry-summary, p",
     tipo_conteudo: "noticia",
   },
   ctp: {
     url: "https://ctp.org.pt/noticias",
+    rss: "https://ctp.org.pt/feed", // Tentar RSS
     nome: "CTP",
     categoria: "concertacao_social",
-    seletor: "article h2 a",
+    seletores: [
+      "article h2 a",
+      ".entry-title a",
+      ".post-title a",
+      "h3 a[href*='/noticias']",
+      ".news-item a"
+    ],
+    seletorData: ".entry-date, .post-date, time, .published",
+    seletorResumo: ".entry-excerpt, .post-excerpt, p",
     tipo_conteudo: "noticia",
   },
 
@@ -48,21 +95,27 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx#1",
     nome: "ACT",
     categoria: "laboral",
-    seletor: ".ms-vb a",
+    seletores: [".ms-vb a", "article a", ".news-item a"],
+    seletorData: ".ms-vb-lastmod, .date, time",
+    seletorResumo: ".ms-vb-brief, p",
     tipo_conteudo: "noticia",
   },
   cite: {
     url: "https://cite.gov.pt/noticias-antigas",
     nome: "CITE",
     categoria: "laboral",
-    seletor: ".entry-title a",
+    seletores: [".entry-title a", "article h2 a", ".news-title a"],
+    seletorData: ".entry-date, time, .published",
+    seletorResumo: ".entry-summary, p",
     tipo_conteudo: "noticia",
   },
   aima: {
     url: "https://aima.gov.pt/pt/noticias",
     nome: "AIMA",
     categoria: "laboral",
-    seletor: ".news-item h3 a",
+    seletores: [".news-item h3 a", "article a", ".noticia a"],
+    seletorData: ".news-date, time, .published",
+    seletorResumo: ".news-summary, p",
     tipo_conteudo: "noticia",
   },
 
@@ -273,85 +326,252 @@ function extrairData($, element) {
 }
 
 // ============================================
-// SCRAPER GENÉRICO
+// SCRAPER GENÉRICO MELHORADO
 // ============================================
 
+// User-Agents variados para evitar bloqueios
+const USER_AGENTS = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
+];
+
+function getRandomUserAgent() {
+  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+}
+
 async function scrapeStakeholder(stakeholderId, config) {
-  console.log(`\n🔍 Scraping ${config.nome}...`);
+  console.log(`\n🔍 Scraping ${config.nome} (${stakeholderId})...`);
+  console.log(`   URL: ${config.url}`);
+
+  // Tentar com retry (até 3 tentativas)
+  for (let tentativa = 1; tentativa <= 3; tentativa++) {
+    try {
+      if (tentativa > 1) {
+        console.log(`   🔄 Tentativa ${tentativa}/3...`);
+        // Delay maior entre retries
+        await new Promise(resolve => setTimeout(resolve, 3000 * tentativa));
+      }
+
+      const response = await axios.get(config.url, {
+        headers: {
+          "User-Agent": getRandomUserAgent(),
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+          "Accept-Language": "pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+          "Accept-Encoding": "gzip, deflate, br",
+          "DNT": "1",
+          "Connection": "keep-alive",
+          "Upgrade-Insecure-Requests": "1",
+          "Sec-Fetch-Dest": "document",
+          "Sec-Fetch-Mode": "navigate",
+          "Sec-Fetch-Site": "none",
+          "Sec-Fetch-User": "?1",
+          "Cache-Control": "max-age=0",
+          "Referer": new URL(config.url).origin,
+        },
+        timeout: 20000,
+        maxRedirects: 5,
+        validateStatus: (status) => status < 500, // Aceitar 4xx para tratar depois
+      });
+
+      // Verificar status
+      if (response.status === 403) {
+        if (tentativa < 3) {
+          console.log(`   ⚠️  Status 403 - Tentando novamente...`);
+          continue; // Tentar próxima iteração
+        }
+        throw new Error('Status 403 - Acesso negado após 3 tentativas');
+      }
+
+      if (response.status === 404) {
+        console.error(`  ❌ Página não encontrada (404)`);
+        return 0;
+      }
+
+      if (response.status >= 400) {
+        throw new Error(`Status HTTP ${response.status}`);
+      }
+
+      const $ = cheerio.load(response.data);
+      const documentos = [];
+      let seletorUsado = null;
+
+      // Suportar configuração antiga (seletor único) e nova (múltiplos seletores)
+      const seletores = config.seletores || [config.seletor];
+
+      // Tentar cada seletor até encontrar resultados
+      for (const seletor of seletores) {
+        const elementos = $(seletor);
+        if (elementos.length > 0) {
+          console.log(`   ✓ Seletor funcionou: "${seletor}" (${elementos.length} elementos)`);
+          seletorUsado = seletor;
+
+          elementos.each((index, element) => {
+            if (index >= 30) return false; // Limitar a 30 notícias
+
+            const $link = $(element);
+            const titulo = $link.text().trim();
+            const url = $link.attr("href");
+
+            if (titulo && url && titulo.length > 10) {
+              const urlCompleta = limparUrl(config.url, url);
+
+              // Extrair data se existir seletor
+              let data = new Date().toISOString().split("T")[0];
+              if (config.seletorData) {
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div");
+                const dataTexto = $container.find(config.seletorData).first().text().trim();
+                if (dataTexto) {
+                  const dataParsed = parseData(dataTexto);
+                  if (dataParsed) data = dataParsed;
+                }
+              }
+
+              // Extrair resumo se existir seletor
+              let resumo = titulo.substring(0, 200);
+              if (config.seletorResumo) {
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div");
+                const resumoTexto = $container.find(config.seletorResumo).first().text().trim();
+                if (resumoTexto && resumoTexto.length > 20) {
+                  resumo = resumoTexto.substring(0, 300);
+                }
+              }
+
+              documentos.push({
+                tipo_conteudo: config.tipo_conteudo,
+                tipo_radar: "stakeholders",
+                categoria: config.categoria,
+                titulo: titulo,
+                data_publicacao: data,
+                url: urlCompleta,
+                fonte: stakeholderId,
+                entidades: config.nome,
+                resumo: resumo,
+              });
+            }
+          });
+
+          break; // Encontrou resultados, não precisa testar outros seletores
+        } else {
+          console.log(`   ✗ Seletor sem resultados: "${seletor}"`);
+        }
+      }
+
+      if (documentos.length === 0) {
+        console.log(`  ⚠️  Nenhum documento encontrado com os seletores configurados`);
+        return 0;
+      }
+
+      console.log(`  📊 Encontrados: ${documentos.length} documentos (seletor: "${seletorUsado}")`);
+
+      // Guardar na base de dados
+      let novosGuardados = 0;
+      let duplicadosIgnorados = 0;
+
+      for (const doc of documentos) {
+        try {
+          // Verificar se já existe
+          const existe = await Document.findOne({ url: doc.url });
+
+          if (!existe) {
+            await Document.create(doc);
+            novosGuardados++;
+            console.log(`    ✅ Novo: ${doc.titulo.substring(0, 70)}...`);
+          } else {
+            duplicadosIgnorados++;
+          }
+        } catch (error) {
+          if (
+            error.code === "23505" ||
+            error.message?.includes("duplicate key") ||
+            error.message?.includes("unique constraint")
+          ) {
+            duplicadosIgnorados++;
+          } else {
+            console.error(`    ❌ Erro ao guardar: ${error.message}`);
+          }
+        }
+      }
+
+      console.log(
+        `  ✅ ${config.nome}: ${novosGuardados} novos, ${duplicadosIgnorados} duplicados`
+      );
+      return novosGuardados;
+
+    } catch (error) {
+      // Se não for a última tentativa e for erro de conexão, continuar
+      if (tentativa < 3 && (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND')) {
+        console.log(`   ⚠️  ${error.message} - Tentando novamente...`);
+        continue;
+      }
+
+      // Última tentativa ou erro não recuperável
+      if (tentativa === 3 || error.response?.status === 403) {
+        if (error.response?.status === 403) {
+          console.error(`  ❌ Acesso negado (403) para ${config.nome} - site tem proteção anti-scraping forte`);
+        } else if (error.code === 'ECONNABORTED') {
+          console.error(`  ❌ Timeout ao aceder ${config.nome}`);
+        } else if (error.response?.status === 404) {
+          console.error(`  ❌ Página não encontrada (404) para ${config.nome}`);
+        } else {
+          console.error(`  ❌ Erro no scraping de ${config.nome}:`, error.message);
+        }
+        return 0;
+      }
+    }
+  }
+
+  // Se chegou aqui, todas as tentativas falharam
+  console.error(`  ❌ Todas as tentativas falharam para ${config.nome}`);
+  return 0;
+}
+
+// Função auxiliar para parsing de datas melhorada
+function parseData(dataString) {
+  if (!dataString) return null;
 
   try {
-    const response = await axios.get(config.url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-      timeout: 15000,
-    });
+    // Remover texto extra e normalizar
+    let texto = dataString
+      .replace(/publicado em|publicado a|data:|em/gi, "")
+      .trim();
 
-    const $ = cheerio.load(response.data);
-    const documentos = [];
+    // Tentar formatos comuns portugueses
+    const regexes = [
+      /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/,  // 15/01/2025 ou 15-01-2025
+      /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/,  // 2025-01-15
+    ];
 
-    // Buscar notícias usando o seletor configurado
-    $(config.seletor).each((index, element) => {
-      const $link = $(element);
-      const titulo = $link.text().trim();
-      const url = $link.attr("href");
-
-      if (titulo && url) {
-        const urlCompleta = limparUrl(config.url, url);
-        const data = extrairData(
-          $,
-          $link.closest("article, .news-item, .entry, .post, .destaque")
-        );
-
-        documentos.push({
-          tipo_conteudo: config.tipo_conteudo,
-          tipo_radar: "stakeholders", // ← IMPORTANTE
-          categoria: config.categoria,
-          titulo: titulo,
-          data_publicacao: data,
-          url: urlCompleta,
-          fonte: stakeholderId,
-          entidades: config.nome,
-        });
-      }
-    });
-
-    console.log(`  📊 Encontrados: ${documentos.length} documentos`);
-
-    // Guardar na base de dados
-    let novosGuardados = 0;
-    let duplicadosIgnorados = 0;
-
-    for (const doc of documentos) {
-      try {
-        await Document.create({
-          ...doc,
-          resumo: doc.titulo.substring(0, 200),
-        });
-
-        novosGuardados++;
-        console.log(`    ✅ Novo: ${doc.titulo.substring(0, 80)}...`);
-      } catch (error) {
-        if (
-          error.code === "23505" ||
-          error.message?.includes("duplicate key")
-        ) {
-          duplicadosIgnorados++;
+    for (const regex of regexes) {
+      const match = texto.match(regex);
+      if (match) {
+        let ano, mes, dia;
+        if (match[1].length === 4) {
+          // Formato YYYY-MM-DD
+          [, ano, mes, dia] = match;
         } else {
-          console.error(`    ❌ Erro ao guardar: ${error.message}`);
+          // Formato DD/MM/YYYY
+          [, dia, mes, ano] = match;
+        }
+        const data = new Date(ano, mes - 1, dia);
+        if (!isNaN(data.getTime())) {
+          return data.toISOString().split("T")[0];
         }
       }
     }
 
-    console.log(
-      `  ✅ ${config.nome}: ${novosGuardados} novos, ${duplicadosIgnorados} duplicados ignorados`
-    );
-    return novosGuardados;
-  } catch (error) {
-    console.error(`  ❌ Erro no scraping de ${config.nome}:`, error.message);
-    return 0;
+    // Tentar parseamento direto
+    const data = new Date(texto);
+    if (!isNaN(data.getTime())) {
+      return data.toISOString().split("T")[0];
+    }
+  } catch (e) {
+    // Ignorar erros
   }
+
+  return null;
 }
 
 // ============================================
