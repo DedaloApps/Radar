@@ -1,212 +1,267 @@
-// src/contexts/UserContext.jsx (SUBSTITUIR COMPLETAMENTE)
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
-import { useRadar } from './Radarcontext';
+import { createContext, useContext, useState, useEffect } from "react";
 
 const UserContext = createContext();
 
-const PREFERENCIAS_DEFAULT = {
-  legislativo: {
-    categorias: [
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser deve ser usado dentro de UserProvider");
+  }
+  return context;
+};
+
+export const UserProvider = ({ children }) => {
+  // Carregar preferências do localStorage
+  const [userEmail, setUserEmail] = useState(
+    () => localStorage.getItem("radar_user_email") || null
+  );
+
+  const [categoriasFavoritas, setCategoriasFavoritas] = useState(() => {
+    const saved = localStorage.getItem("radar_categorias_favoritas");
+    return saved
+      ? JSON.parse(saved)
+      : [
+          "comissao_01",
+          "comissao_02",
+          "comissao_03",
+          "comissao_04",
+          "comissao_05",
+        ];
+  });
+
+  const [tiposConteudoVisiveis, setTiposConteudoVisiveis] = useState(() => {
+    const saved = localStorage.getItem("radar_tipos_conteudo");
+    return saved
+      ? JSON.parse(saved)
+      : [
+          "agenda",
+          "audicao",
+          "audiencia",
+          "iniciativa",
+          "peticao",
+          "geral",
+          "pergunta",      // ✅ NOVO
+          "requerimento",  // ✅ NOVO
+          "votacao",       // ✅ NOVO
+          "sumula",        // ✅ NOVO
+        ];
+  });
+
+  // Estado para documentos lidos
+  const [documentosLidos, setDocumentosLidos] = useState(() => {
+    const saved = localStorage.getItem("radar_documentos_lidos");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Salvar no localStorage sempre que mudar
+  useEffect(() => {
+    localStorage.setItem(
+      "radar_categorias_favoritas",
+      JSON.stringify(categoriasFavoritas)
+    );
+  }, [categoriasFavoritas]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "radar_tipos_conteudo",
+      JSON.stringify(tiposConteudoVisiveis)
+    );
+  }, [tiposConteudoVisiveis]);
+
+  useEffect(() => {
+    if (userEmail) {
+      localStorage.setItem("radar_user_email", userEmail);
+    } else {
+      localStorage.removeItem("radar_user_email");
+    }
+  }, [userEmail]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "radar_documentos_lidos",
+      JSON.stringify(documentosLidos)
+    );
+  }, [documentosLidos]);
+
+  // Funções de categorias
+  const toggleCategoria = (categoriaId) => {
+    setCategoriasFavoritas((prev) => {
+      if (prev.includes(categoriaId)) {
+        if (prev.length <= 1) return prev;
+        return prev.filter((c) => c !== categoriaId);
+      } else {
+        return [...prev, categoriaId];
+      }
+    });
+  };
+
+  const toggleTipoConteudo = (tipo) => {
+    setTiposConteudoVisiveis((prev) => {
+      if (prev.includes(tipo)) {
+        if (prev.length <= 1) return prev;
+        return prev.filter((t) => t !== tipo);
+      } else {
+        return [...prev, tipo];
+      }
+    });
+  };
+
+  const resetarPreferencias = () => {
+    setCategoriasFavoritas([
       "comissao_01",
       "comissao_02",
       "comissao_03",
       "comissao_04",
       "comissao_05",
-    ],
-    tipos: [
+    ]);
+    setTiposConteudoVisiveis([
       "agenda",
       "audicao",
       "audiencia",
       "iniciativa",
       "peticao",
       "geral",
-      "pergunta",
-      "requerimento",
-      "votacao",
-      "sumula",
-    ]
-  },
-  stakeholders: {
-    categorias: [],
-    tipos: ['noticia', 'comunicado', 'destaque', 'relatorio', 'posicionamento', 'evento']
-  }
-};
-
-export const UserProvider = ({ children }) => {
-  const { user } = useAuth();
-  const { radarAtivo } = useRadar();
-  
-  const [preferencias, setPreferencias] = useState(() => {
-    const saved = localStorage.getItem(`radar_preferencias_${user?.id || 'guest'}`);
-    return saved ? JSON.parse(saved) : PREFERENCIAS_DEFAULT;
-  });
-
-  const [documentosLidos, setDocumentosLidos] = useState(() => {
-    const saved = localStorage.getItem(`radar_documentos_lidos_${user?.id || 'guest'}`);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [documentosArquivados, setDocumentosArquivados] = useState(() => {
-    const saved = localStorage.getItem(`radar_documentos_arquivados_${user?.id || 'guest'}`);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [documentosFavoritos, setDocumentosFavoritos] = useState(() => {
-    const saved = localStorage.getItem(`radar_documentos_favoritos_${user?.id || 'guest'}`);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem(`radar_preferencias_${user?.id || 'guest'}`, JSON.stringify(preferencias));
-  }, [preferencias, user?.id]);
-
-  useEffect(() => {
-    localStorage.setItem(`radar_documentos_lidos_${user?.id || 'guest'}`, JSON.stringify(documentosLidos));
-  }, [documentosLidos, user?.id]);
-
-  useEffect(() => {
-    localStorage.setItem(`radar_documentos_arquivados_${user?.id || 'guest'}`, JSON.stringify(documentosArquivados));
-  }, [documentosArquivados, user?.id]);
-
-  useEffect(() => {
-    localStorage.setItem(`radar_documentos_favoritos_${user?.id || 'guest'}`, JSON.stringify(documentosFavoritos));
-  }, [documentosFavoritos, user?.id]);
-
-  const categoriasFavoritas = preferencias[radarAtivo]?.categorias || [];
-  const tiposConteudoVisiveis = preferencias[radarAtivo]?.tipos || [];
-
-  const toggleCategoria = (categoriaId) => {
-    setPreferencias(prev => {
-      const radarPrefs = prev[radarAtivo] || PREFERENCIAS_DEFAULT[radarAtivo];
-      const categorias = radarPrefs.categorias || [];
-      
-      const novasCategorias = categorias.includes(categoriaId)
-        ? categorias.filter(c => c !== categoriaId)
-        : [...categorias, categoriaId];
-
-      return {
-        ...prev,
-        [radarAtivo]: {
-          ...radarPrefs,
-          categorias: novasCategorias
-        }
-      };
-    });
+      "pergunta",      // ✅ NOVO
+      "requerimento",  // ✅ NOVO
+      "votacao",       // ✅ NOVO
+      "sumula",        // ✅ NOVO
+    ]);
   };
 
-  const toggleTipoConteudo = (tipo) => {
-    setPreferencias(prev => {
-      const radarPrefs = prev[radarAtivo] || PREFERENCIAS_DEFAULT[radarAtivo];
-      const tipos = radarPrefs.tipos || [];
-      
-      const novosTipos = tipos.includes(tipo)
-        ? tipos.filter(t => t !== tipo)
-        : [...tipos, tipo];
-
-      return {
-        ...prev,
-        [radarAtivo]: {
-          ...radarPrefs,
-          tipos: novosTipos
-        }
-      };
-    });
-  };
-
-  const resetarPreferencias = () => {
-    setPreferencias(PREFERENCIAS_DEFAULT);
-  };
-
-  const foiLido = (docId) => documentosLidos.includes(docId);
-  
-  const marcarComoLido = (docId) => {
-    if (!foiLido(docId)) {
-      setDocumentosLidos(prev => [...prev, docId]);
+  // Funções de documentos lidos
+  const marcarComoLido = (documentoId) => {
+    if (!documentosLidos.includes(documentoId)) {
+      setDocumentosLidos((prev) => [...prev, documentoId]);
     }
   };
 
-  const marcarComoNaoLido = (docId) => {
-    setDocumentosLidos(prev => prev.filter(id => id !== docId));
+  // ✅ NOVA FUNÇÃO: Marcar como não lido
+  const marcarComoNaoLido = (documentoId) => {
+    setDocumentosLidos((prev) => prev.filter((id) => id !== documentoId));
+  };
+
+  const foiLido = (documentoId) => {
+    return documentosLidos.includes(documentoId);
   };
 
   const limparLidosAntigos = () => {
     setDocumentosLidos([]);
   };
 
-  const estaArquivado = (docId) => documentosArquivados.includes(docId);
+  // Estado para documentos arquivados
+  const [documentosArquivados, setDocumentosArquivados] = useState(() => {
+    const saved = localStorage.getItem("radar_documentos_arquivados");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const arquivarDocumento = (docId) => {
-    if (!estaArquivado(docId)) {
-      setDocumentosArquivados(prev => [...prev, docId]);
-      marcarComoLido(docId);
+  // Salvar documentos arquivados no localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      "radar_documentos_arquivados",
+      JSON.stringify(documentosArquivados)
+    );
+  }, [documentosArquivados]);
+
+  // Arquivar documento
+  const arquivarDocumento = (documentoId) => {
+    if (!documentosArquivados.includes(documentoId)) {
+      setDocumentosArquivados((prev) => [...prev, documentoId]);
+      // Também marca como lido
+      marcarComoLido(documentoId);
     }
   };
 
-  const restaurarDocumento = (docId) => {
-    setDocumentosArquivados(prev => prev.filter(id => id !== docId));
+  // Restaurar documento
+  const restaurarDocumento = (documentoId) => {
+    setDocumentosArquivados((prev) => prev.filter((id) => id !== documentoId));
   };
 
+  // Verificar se documento está arquivado
+  const estaArquivado = (documentoId) => {
+    return documentosArquivados.includes(documentoId);
+  };
+
+  // Limpar arquivados
   const limparArquivados = () => {
     setDocumentosArquivados([]);
   };
 
-  const eFavorito = (docId) => documentosFavoritos.includes(docId);
+  // Estado para documentos favoritos
+  const [documentosFavoritos, setDocumentosFavoritos] = useState(() => {
+    const saved = localStorage.getItem("radar_documentos_favoritos");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const adicionarFavorito = (docId) => {
-    if (!eFavorito(docId)) {
-      setDocumentosFavoritos(prev => [...prev, docId]);
+  // Salvar documentos favoritos no localStorage
+  useEffect(() => {
+    localStorage.setItem(
+      "radar_documentos_favoritos",
+      JSON.stringify(documentosFavoritos)
+    );
+  }, [documentosFavoritos]);
+
+  // Adicionar aos favoritos
+  const adicionarFavorito = (documentoId) => {
+    if (!documentosFavoritos.includes(documentoId)) {
+      setDocumentosFavoritos((prev) => [...prev, documentoId]);
     }
   };
 
-  const removerFavorito = (docId) => {
-    setDocumentosFavoritos(prev => prev.filter(id => id !== docId));
+  // Remover dos favoritos
+  const removerFavorito = (documentoId) => {
+    setDocumentosFavoritos((prev) => prev.filter((id) => id !== documentoId));
   };
 
-  const toggleFavorito = (docId) => {
-    if (eFavorito(docId)) {
-      removerFavorito(docId);
+  // Toggle favorito
+  const toggleFavorito = (documentoId) => {
+    if (documentosFavoritos.includes(documentoId)) {
+      removerFavorito(documentoId);
     } else {
-      adicionarFavorito(docId);
+      adicionarFavorito(documentoId);
     }
   };
 
+  // Verificar se é favorito
+  const eFavorito = (documentoId) => {
+    return documentosFavoritos.includes(documentoId);
+  };
+
+  // Limpar favoritos
   const limparFavoritos = () => {
     setDocumentosFavoritos([]);
   };
 
   return (
-    <UserContext.Provider value={{
-      categoriasFavoritas,
-      tiposConteudoVisiveis,
-      toggleCategoria,
-      toggleTipoConteudo,
-      resetarPreferencias,
-      foiLido,
-      marcarComoLido,
-      marcarComoNaoLido,
-      limparLidosAntigos,
-      estaArquivado,
-      arquivarDocumento,
-      restaurarDocumento,
-      documentosArquivados,
-      limparArquivados,
-      documentosFavoritos,
-      eFavorito,
-      adicionarFavorito,
-      removerFavorito,
-      toggleFavorito,
-      limparFavoritos
-    }}>
+    <UserContext.Provider
+      value={{
+        userEmail,
+        setUserEmail,
+        categoriasFavoritas,
+        setCategoriasFavoritas,
+        toggleCategoria,
+        tiposConteudoVisiveis,
+        setTiposConteudoVisiveis,
+        toggleTipoConteudo,
+        resetarPreferencias,
+        documentosLidos,
+        marcarComoLido,
+        marcarComoNaoLido, // ✅ NOVO
+        foiLido,
+        limparLidosAntigos,
+        documentosArquivados,
+        arquivarDocumento,
+        restaurarDocumento,
+        estaArquivado,
+        limparArquivados,
+        documentosFavoritos,
+        adicionarFavorito,
+        removerFavorito,
+        toggleFavorito,
+        eFavorito,
+        limparFavoritos,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
-};
-
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error('useUser must be used within UserProvider');
-  }
-  return context;
 };

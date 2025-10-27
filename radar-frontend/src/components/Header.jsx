@@ -1,45 +1,32 @@
 import { 
   BellIcon, 
   Cog6ToothIcon,
+  MagnifyingGlassIcon,
   ArrowPathIcon,
   ShieldCheckIcon,
   ArrowRightOnRectangleIcon,
-  StarIcon,
-  ChevronRightIcon
+  StarIcon
 } from '@heroicons/react/24/outline';
 import { BellIcon as BellSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
-import { useRadar } from '../contexts/Radarcontext';
-import { RADARS_CONFIG } from '../utils/radars';
 
 const Header = ({ 
   ultimaAtualizacao, 
   notificationEnabled, 
   onToggleNotifications,
   onRefresh,
-  onOpenConfig,
+  onOpenConfig, 
   onOpenAdmin,
   onOpenFavorites,
   isRefreshing,
   favoritesEnabled
 }) => {
   const { user, logout, isAdmin } = useAuth();
-  const { radarAtivo, mudarRadar } = useRadar();
-
-  // Obter configuração do radar ativo
-  const radarConfig = RADARS_CONFIG[radarAtivo];
-  const RadarIcon = radarConfig?.icon;
-
-  // Alternar entre radares
-  const toggleRadar = () => {
-    const proximoRadar = radarAtivo === 'legislativo' ? 'stakeholders' : 'legislativo';
-    mudarRadar(proximoRadar);
-  };
 
   return (
     <header className="rounded-2xl p-4 mb-6">
       <div className="flex items-center justify-between">
-        {/* Logo, Título e Botão de Troca */}
+        {/* Logo e Título */}
         <div className="flex items-center gap-4">
           <div className="relative">
             {/* Glow effect - AZUL */}
@@ -54,69 +41,18 @@ const Header = ({
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div>
-              {/* Título dinâmico com ícone do radar */}
-              <div className="flex items-center gap-2">
-                {RadarIcon && (
-                  <RadarIcon 
-                    className="w-7 h-7"
-                    style={{ color: radarConfig.cores.secundaria }}
-                  />
-                )}
-                <h1 className="text-3xl font-black bg-clip-text text-transparent drop-shadow-lg"
-                    style={{ 
-                      backgroundImage: 'linear-gradient(to right, #7dd3fc, #27aae2, #06b6d4)'
-                    }}>
-                  {radarConfig?.nome.toUpperCase() || 'RADAR LEGISLATIVO'}
-                </h1>
-              </div>
-              <p className="text-sm font-semibold tracking-wide"
-                 style={{ color: '#27aae2' }}>
-                Olá, {user?.nome || 'Utilizador'} 👋
-              </p>
-            </div>
-
-            {/* Botão de Troca de Radar - Profissional */}
-            <button
-              onClick={toggleRadar}
-              className="ml-4 flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all group relative overflow-hidden"
-              style={{
-                backgroundColor: 'rgba(39, 170, 226, 0.1)',
-                borderColor: 'rgba(39, 170, 226, 0.4)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(39, 170, 226, 0.2)';
-                e.currentTarget.style.borderColor = '#27aae2';
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(39, 170, 226, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(39, 170, 226, 0.1)';
-                e.currentTarget.style.borderColor = 'rgba(39, 170, 226, 0.4)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-              title={`Mudar para ${radarAtivo === 'legislativo' ? 'Stakeholders' : 'Legislativo'}`}
-            >
-              {/* Glow animado no hover */}
-              <div 
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          <div>
+            {/* Título com gradiente AZUL/CYAN */}
+            <h1 className="text-3xl font-black bg-clip-text text-transparent drop-shadow-lg"
                 style={{ 
-                  background: 'linear-gradient(90deg, transparent, rgba(39, 170, 226, 0.2), transparent)',
-                  animation: 'shimmer 2s infinite'
-                }}
-              />
-
-              {/* Conteúdo */}
-              <div className="relative flex items-center gap-2">
-                <span className="text-xs font-bold tracking-wide" style={{ color: '#7dd3fc' }}>
-                  {radarAtivo === 'legislativo' ? 'VER STAKEHOLDERS' : 'VER LEGISLATIVO'}
-                </span>
-                <ChevronRightIcon 
-                  className="w-4 h-4 transition-transform group-hover:translate-x-1" 
-                  style={{ color: '#27aae2' }}
-                />
-              </div>
-            </button>
+                  backgroundImage: 'linear-gradient(to right, #7dd3fc, #27aae2, #06b6d4)'
+                }}>
+              RADAR LEGISLATIVO
+            </h1>
+            <p className="text-sm font-semibold tracking-wide"
+               style={{ color: '#27aae2' }}>
+              Olá, {user?.nome || 'Utilizador'} 👋
+            </p>
           </div>
         </div>
 
@@ -141,7 +77,7 @@ const Header = ({
             </div>
           )}
 
-          {/* Botão Admin (só para admins) - AMARELO */}
+          {/* Botão Admin (só para admins) - AMARELO (mantém) */}
           {isAdmin && onOpenAdmin && (
             <button
               onClick={onOpenAdmin}
@@ -177,6 +113,9 @@ const Header = ({
             />
           </button>
 
+          {/* Botão Pesquisa - AZUL */}
+          
+
           {/* Botão Notificações - AZUL */}
           <button
             onClick={onToggleNotifications}
@@ -210,7 +149,7 @@ const Header = ({
             )}
           </button>
 
-          {/* Botão Favoritos - AMARELO */}
+          {/* Botão Favoritos - AMARELO (mantém) */}
           <button
             onClick={onOpenFavorites}
             className={`p-3 rounded-xl border transition-all backdrop-blur-sm ${
@@ -261,7 +200,7 @@ const Header = ({
             <Cog6ToothIcon className="w-5 h-5" style={{ color: '#7dd3fc' }} />
           </button>
 
-          {/* Botão Logout - VERMELHO */}
+          {/* Botão Logout - VERMELHO (mantém) */}
           <button
             onClick={logout}
             className="p-3 bg-red-500/10 hover:bg-red-500/20 rounded-xl border border-red-500/30 transition-all backdrop-blur-sm hover:shadow-lg hover:shadow-red-500/20"
@@ -271,14 +210,6 @@ const Header = ({
           </button>
         </div>
       </div>
-
-      {/* CSS para animação shimmer */}
-      <style>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
     </header>
   );
 };

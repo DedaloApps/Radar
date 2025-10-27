@@ -5,18 +5,19 @@ import { testConnection } from './config/supabase.js';
 import { iniciarAgendamento } from './services/scheduler.js';
 import documentRoutes from './routes/documentRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import authRoutes from './routes/authRoutes.js'; // ← NOVO
+import authRoutes from './routes/authRoutes.js';
+import stakeholderRoutes from './routes/stakeholderRoutes.js'; // ← NOVO
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-    origin: [
+  origin: [
     'http://localhost:5173',
     'https://radar-vul1.onrender.com',
-    'https://radar-frontend-sable.vercel.app',  // ← Adiciona o TEU URL da Vercel aqui
-    /\.vercel\.app$/,  // ← Aceita qualquer subdomínio vercel
+    'https://radar-frontend-sable.vercel.app',
+    /\.vercel\.app$/,
   ],
   credentials: true
 }));
@@ -25,7 +26,8 @@ app.use(express.json());
 // Rotas
 app.use('/api/documents', documentRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes); // ← NOVO
+app.use('/api/auth', authRoutes);
+app.use('/api/stakeholders', stakeholderRoutes); // ← NOVO
 
 // Rota de teste
 app.get('/api/health', (req, res) => {

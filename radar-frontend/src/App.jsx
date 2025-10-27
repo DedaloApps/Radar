@@ -1,8 +1,6 @@
-// src/App.jsx (ATUALIZAR - remover RadarNavigation)
 import { useState, useEffect } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { UserProvider } from "./contexts/UserContext";
-import { RadarProvider, useRadar } from "./contexts/Radarcontext";
+import { UserProvider, useUser } from "./contexts/UserContext";
 import Header from "./components/Header";
 import RadarFullScreen from "./components/RadarFullScreen";
 import ConfigModal from "./components/ConfigModal";
@@ -15,16 +13,16 @@ import DocumentDetailModal from "./components/DocumentDetailModal";
 
 function AppContent() {
   const { isAuthenticated, loading: authLoading, isAdmin } = useAuth();
-  const { radarAtivo } = useRadar();
   const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const { documentosFavoritos } = useUser();
 
-  const { stats } = useStats(radarAtivo);
-  const { documents, refetch } = useDocuments(radarAtivo);
+  const { stats } = useStats();
+  const { documents, refetch } = useDocuments();
 
   useEffect(() => {
     if ("Notification" in window) {
@@ -45,22 +43,24 @@ function AppContent() {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
+  // Mostrar loading enquanto verifica autenticação
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin w-16 h-16 border-4 border-t-transparent rounded-full mx-auto mb-4"
-               style={{ borderColor: '#27aae2', borderTopColor: 'transparent' }}></div>
-          <p className="text-lg" style={{ color: '#7dd3fc' }}>Carregando...</p>
+          <div className="animate-spin w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-emerald-300 text-lg">Carregando...</p>
         </div>
       </div>
     );
   }
 
+  // Se não autenticado, mostrar login
   if (!isAuthenticated) {
     return <LoginPage />;
   }
 
+  // Se autenticado, mostrar radar
   return (
     <div className="relative w-full h-screen overflow-hidden bg-slate-950">
       <div className="fixed top-0 left-0 right-0 z-50 p-4">
@@ -73,22 +73,22 @@ function AppContent() {
           onOpenAdmin={isAdmin ? () => setIsAdminOpen(true) : null}
           onOpenFavorites={() => setMostrarFavoritos(true)}
           favoritesEnabled={mostrarFavoritos}
+          favoritesCount={documentosFavoritos.length}
           isRefreshing={isRefreshing}
         />
       </div>
 
-      <div className="absolute inset-0 pt-32">
-        <RadarFullScreen 
-          stats={stats} 
-          documents={documents}
-        />
+      <div className="absolute inset-0 pt-24">
+        <RadarFullScreen stats={stats} documents={documents} />
       </div>
 
+      {/* Modais */}
       <ConfigModal
         isOpen={isConfigOpen}
         onClose={() => setIsConfigOpen(false)}
       />
 
+      {/* Modal de Favoritos */}
       {mostrarFavoritos && (
         <FavoritosModal
           onClose={() => setMostrarFavoritos(false)}
@@ -100,6 +100,7 @@ function AppContent() {
         />
       )}
 
+      {/* Modal de Detalhe do Documento */}
       {selectedDocument && (
         <DocumentDetailModal
           document={selectedDocument}
@@ -120,11 +121,9 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <RadarProvider>
-        <UserProvider>
-          <AppContent />
-        </UserProvider>
-      </RadarProvider>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
     </AuthProvider>
   );
 }
