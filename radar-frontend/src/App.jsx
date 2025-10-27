@@ -19,10 +19,11 @@ function AppContent() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [mostrarFavoritos, setMostrarFavoritos] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [tipoRadar, setTipoRadar] = useState('parlamento'); // Estado do tipo de radar
   const { documentosFavoritos } = useUser();
 
-  const { stats } = useStats();
-  const { documents, refetch } = useDocuments();
+  const { stats } = useStats(tipoRadar); // Passar tipoRadar para useStats
+  const { documents, refetch } = useDocuments(tipoRadar); // Passar tipoRadar para useDocuments
 
   useEffect(() => {
     if ("Notification" in window) {
@@ -41,6 +42,10 @@ function AppContent() {
     setIsRefreshing(true);
     await refetch();
     setTimeout(() => setIsRefreshing(false), 1000);
+  };
+
+  const handleToggleTipoRadar = (tipo) => {
+    setTipoRadar(tipo);
   };
 
   // Mostrar loading enquanto verifica autenticação
@@ -75,6 +80,8 @@ function AppContent() {
           favoritesEnabled={mostrarFavoritos}
           favoritesCount={documentosFavoritos.length}
           isRefreshing={isRefreshing}
+          tipoRadar={tipoRadar}
+          onToggleTipoRadar={handleToggleTipoRadar}
         />
       </div>
 

@@ -1,25 +1,29 @@
-import { 
-  BellIcon, 
+import {
+  BellIcon,
   Cog6ToothIcon,
   MagnifyingGlassIcon,
   ArrowPathIcon,
   ShieldCheckIcon,
   ArrowRightOnRectangleIcon,
-  StarIcon
+  StarIcon,
+  BuildingLibraryIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { BellIcon as BellSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 
-const Header = ({ 
-  ultimaAtualizacao, 
-  notificationEnabled, 
+const Header = ({
+  ultimaAtualizacao,
+  notificationEnabled,
   onToggleNotifications,
   onRefresh,
-  onOpenConfig, 
+  onOpenConfig,
   onOpenAdmin,
   onOpenFavorites,
   isRefreshing,
-  favoritesEnabled
+  favoritesEnabled,
+  tipoRadar,
+  onToggleTipoRadar
 }) => {
   const { user, logout, isAdmin } = useAuth();
 
@@ -86,6 +90,52 @@ const Header = ({
             >
               <ShieldCheckIcon className="w-5 h-5 text-yellow-400" />
             </button>
+          )}
+
+          {/* Toggle Parlamento/Stakeholders - AZUL */}
+          {onToggleTipoRadar && (
+            <div className="hidden md:flex items-center gap-1 rounded-xl border backdrop-blur-sm p-1"
+                 style={{
+                   backgroundColor: 'rgba(39, 170, 226, 0.1)',
+                   borderColor: 'rgba(39, 170, 226, 0.3)'
+                 }}>
+              <button
+                onClick={() => onToggleTipoRadar('parlamento')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                  tipoRadar === 'parlamento'
+                    ? 'shadow-lg'
+                    : 'hover:bg-white/5'
+                }`}
+                style={tipoRadar === 'parlamento' ? {
+                  backgroundColor: '#27aae2',
+                  color: '#ffffff'
+                } : {
+                  color: '#7dd3fc'
+                }}
+                title="Parlamento"
+              >
+                <BuildingLibraryIcon className="w-4 h-4" />
+                <span className="text-xs font-semibold">Parlamento</span>
+              </button>
+              <button
+                onClick={() => onToggleTipoRadar('stakeholders')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                  tipoRadar === 'stakeholders'
+                    ? 'shadow-lg'
+                    : 'hover:bg-white/5'
+                }`}
+                style={tipoRadar === 'stakeholders' ? {
+                  backgroundColor: '#27aae2',
+                  color: '#ffffff'
+                } : {
+                  color: '#7dd3fc'
+                }}
+                title="Stakeholders"
+              >
+                <UserGroupIcon className="w-4 h-4" />
+                <span className="text-xs font-semibold">Stakeholders</span>
+              </button>
+            </div>
           )}
 
           {/* Botão Refresh - AZUL */}
