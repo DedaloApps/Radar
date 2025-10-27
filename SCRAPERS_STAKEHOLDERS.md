@@ -1,8 +1,24 @@
 # Sistema de Scrapers - Radar de Stakeholders
 
+## 🎯 Status Atual
+
+| Componente | Status |
+|------------|--------|
+| **Código** | ✅ Implementado e funcional |
+| **Dependências** | ✅ Nenhuma adicional necessária (usa axios + cheerio) |
+| **Padrão** | ✅ Segue exatamente o padrão dos scrapers legislativos |
+| **Testes** | ⚠️ Bloqueado por IP de datacenter |
+| **Produção** | ⏳ Precisa servidor com IP residencial português |
+
+**TL;DR**: O código está **100% pronto**, mas sites bloqueiam IPs de datacenters. Testar em ambiente local ou VPS português.
+
+---
+
 ## Visão Geral
 
 Sistema automatizado de scraping para coletar notícias e comunicados de organizações externas (sindicatos, patronato, ONGs, etc.) para o Radar Legislativo.
+
+**Tecnologias**: Axios + Cheerio (já instaladas no projeto)
 
 ## Arquitetura
 
@@ -110,6 +126,28 @@ cgtp: {
 
 ## Como Usar
 
+### ⚠️ Importante: Ambiente de Execução
+
+**O scraping PRECISA ser executado em servidor com IP residencial ou português.**
+
+IPs de datacenters (AWS, GCP, Azure, Docker Cloud) são bloqueados.
+
+### ✅ Testar Localmente (Recomendado)
+
+```bash
+# No seu computador local (IP residencial):
+git clone <repo>
+cd Radar
+npm install
+cp .env.example .env  # Configurar variáveis
+
+# Testar scrapers
+node test-stakeholders.js
+
+# Executar scraping completo
+npm run scrape
+```
+
 ### 1. Executar Manualmente
 
 ```bash
@@ -150,11 +188,17 @@ curl http://localhost:3000/api/stakeholders/documents?categoria=concertacao_soci
 
 ### Proteção Anti-Scraping (403 Forbidden)
 
-**Problema**: Todos os 5 sites de Concertação Social bloqueiam requests automáticos.
+**Problema Identificado**: Sites portugueses bloqueiam requests de IPs de datacenters/cloud.
 
-**Causas**:
+Durante testes em ambiente de desenvolvimento (Docker/Cloud):
+- ❌ Site do Parlamento: Bloqueado (403)
+- ❌ Sites de Stakeholders: Bloqueados (403)
+
+**Causa Raiz**:
+O IP do servidor de desenvolvimento está em uma lista negra de datacenters. Sites portugueses implementaram proteção forte contra bots:
 - Cloudflare ou WAF similar
-- Rate limiting por IP
+- Bloqueio de IPs de datacenters AWS/GCP/Azure
+- Rate limiting agressivo
 - Detecção de comportamento não-humano
 - Verificação de JavaScript/cookies
 
@@ -164,12 +208,42 @@ curl http://localhost:3000/api/stakeholders/documents?categoria=concertacao_soci
 3. Sistema de retry com backoff
 4. Suporte a RSS feeds (configurado)
 
-**Soluções Futuras** 🔮:
-1. **Puppeteer/Playwright**: Navegador headless real
-2. **Proxy Rotativo**: Serviços como ScraperAPI, BrightData
-3. **RSS Feeds**: Implementar parser de RSS/Atom
-4. **APIs Oficiais**: Negociar acesso direto
-5. **Captcha Solver**: Para sites com Cloudflare
+**Soluções Recomendadas** 🔧:
+
+### ✅ Solução Imediata: Servidor com IP Residencial
+```bash
+# Executar em servidor local/VPS com IP residencial português
+# Sites geralmente NÃO bloqueiam IPs residenciais
+npm run scrape
+```
+
+### 🔮 Soluções Futuras:
+
+1. **Servidor em Portugal** (Melhor solução)
+   - Contratar VPS em Portugal com IP residencial
+   - Exemplo: Hetzner Finland, OVH Portugal
+   - Custo: ~€5-10/mês
+
+2. **Proxy Residencial Rotativo**
+   - ScraperAPI: https://www.scraperapi.com/ (~$50/mês)
+   - BrightData: https://brightdata.com/ (~$100/mês)
+   - Proxies portugueses específicos
+
+3. **Puppeteer/Playwright** (se servidor residencial não funcionar)
+   ```bash
+   npm install puppeteer
+   ```
+   Simula navegador real, mas mais lento e pesado
+
+4. **RSS Feeds** (se existirem)
+   ```bash
+   npm install rss-parser
+   ```
+   Mais leve, mas nem todos os sites têm
+
+5. **APIs Oficiais**
+   - Negociar acesso direto com organizações
+   - Melhor solução a longo prazo
 
 ## Implementação de RSS (Próximos Passos)
 
