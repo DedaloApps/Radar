@@ -130,44 +130,92 @@ const STAKEHOLDERS_CONFIG = {
   // AMBIENTE
   apambiente: {
     url: "https://apambiente.pt/destaques",
+    baseUrl: "https://apambiente.pt",
     nome: "APA",
     categoria: "stake_ambiente",
-    seletor: ".destaque-titulo a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      "h2.is-size-5 a",                       // ✅ Seletor correto confirmado
+      ".content h2 a",                        // Fallback 1
+      "article h2 a",                         // Fallback 2
+    ],
+    seletorData: "time[datetime]",            // Data: "2025-10-28T10:40:12+00:00"
+    seletorResumo: ".content",                // Resumo após o título
     tipo_conteudo: "destaque",
   },
   igamaot: {
     url: "https://www.igamaot.gov.pt/pt/espaco-publico/destaques#1",
+    baseUrl: "https://www.igamaot.gov.pt",
     nome: "IGAMAOT",
     categoria: "stake_ambiente",
-    seletor: ".ms-vb a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".info .title a",                       // ✅ Seletor correto confirmado
+      ".title a[href*='/destaques/']",        // Fallback 1
+      "div.title a",                          // Fallback 2
+    ],
+    seletorData: ".tag a",                    // Data: "2025-10-28" (dentro de .tag)
+    seletorResumo: ".title a",                // IGAMAOT não tem resumo, usar título
     tipo_conteudo: "destaque",
   },
   dgav: {
     url: "https://www.dgav.pt/destaques/noticias/",
+    baseUrl: "https://www.dgav.pt",
     nome: "DGAV",
     categoria: "stake_ambiente",
-    seletor: ".entry-title a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      "h5 a.red",                             // ✅ Seletor correto confirmado
+      "h5 a[rel='bookmark']",                 // Fallback 1
+      ".pb-3 h5 a",                           // Fallback 2
+    ],
+    seletorData: ".green",                    // Data: "28/10/2025" (span com class green)
+    seletorResumo: "h5 a",                    // DGAV não tem resumo, usar título
     tipo_conteudo: "noticia",
   },
   dgeg: {
     url: "https://www.dgeg.gov.pt/pt/destaques/",
+    baseUrl: "https://www.dgeg.gov.pt",
     nome: "DGEG",
     categoria: "stake_ambiente",
-    seletor: ".news-item h3 a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".card-title h1",                       // ✅ Seletor correto confirmado
+      ".card .card-title h1",                 // Fallback 1
+      ".card-button a",                       // Fallback 2 (link "Ler mais")
+    ],
+    seletorData: ".card-content",             // DGEG não tem data visível no HTML fornecido
+    seletorResumo: ".card-content p",         // Resumo vazio no exemplo, mas preservar para futuro
     tipo_conteudo: "destaque",
   },
   adene: {
     url: "https://www.adene.pt/comunicacao/noticias/",
+    baseUrl: "https://www.adene.pt",
     nome: "ADENE",
     categoria: "stake_ambiente",
-    seletor: ".noticia a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      "h4.pt-cv-title a",                     // ✅ Seletor correto confirmado
+      ".pt-cv-content-item h4 a",             // Fallback 1
+      "a[href*='/adene-lanca']",              // Fallback 2
+    ],
+    seletorData: ".entry-date time",          // Data: "Outubro 27, 2025" (time[datetime])
+    seletorResumo: "h4.pt-cv-title a",        // ADENE não tem resumo, usar título
     tipo_conteudo: "noticia",
   },
   erse: {
     url: "https://www.erse.pt/comunicacao/destaques/",
+    baseUrl: "https://www.erse.pt",
     nome: "ERSE",
     categoria: "stake_ambiente",
-    seletor: ".destaque h3 a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".card-body .card-title",               // ✅ Seletor correto confirmado (p.card-title)
+      ".card-body p.card-title",              // Fallback 1
+      ".card-body a .card-title",             // Fallback 2
+    ],
+    seletorData: ".card-data",                // Data: "28/10/2025" (p.card-text.card-data)
+    seletorResumo: ".card-title",             // ERSE não tem resumo, usar título
     tipo_conteudo: "destaque",
   },
 
