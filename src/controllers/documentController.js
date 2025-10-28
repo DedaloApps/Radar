@@ -3,11 +3,13 @@ import Document from '../models/Document.js';
 // Obter documentos recentes
 export const getRecentDocuments = async (req, res) => {
   try {
-    const { categoria, fonte, limit = 500 } = req.query; // ← AUMENTADO PARA 500
-
+    // ✅ LER tipo_radar da query, default 'parlamento'
+    const { categoria, fonte, limit = 500, tipo_radar = 'parlamento' } = req.query;
+    
     const filtro = {
-      tipo_radar: 'parlamento' // ← FILTRAR APENAS PARLAMENTO
+      tipo_radar // ✅ USAR O PARÂMETRO DINÂMICO
     };
+    
     if (categoria) filtro.categoria = categoria;
     if (fonte) filtro.fonte = fonte;
     if (limit) filtro.limit = parseInt(limit);
@@ -19,7 +21,6 @@ export const getRecentDocuments = async (req, res) => {
       count: documentos.length,
       data: documentos
     });
-
   } catch (error) {
     console.error('Erro ao buscar documentos:', error);
     res.status(500).json({
@@ -32,9 +33,12 @@ export const getRecentDocuments = async (req, res) => {
 // Estatísticas por categoria
 export const getStats = async (req, res) => {
   try {
-    // Buscar todos documentos do parlamento
+    // ✅ LER tipo_radar da query, default 'parlamento'
+    const { tipo_radar = 'parlamento' } = req.query;
+
+    // Buscar todos documentos do tipo especificado
     const todos = await Document.find({
-      tipo_radar: 'parlamento', // ← FILTRAR APENAS PARLAMENTO
+      tipo_radar, // ✅ USAR O PARÂMETRO DINÂMICO
       limit: 10000
     });
 
@@ -56,7 +60,6 @@ export const getStats = async (req, res) => {
     // Documentos de hoje (últimas 24h)
     const ontem = new Date();
     ontem.setDate(ontem.getDate() - 1);
-
     const documentosHoje = todos.filter(doc =>
       new Date(doc.created_at) >= ontem
     ).length;
@@ -70,7 +73,6 @@ export const getStats = async (req, res) => {
         ultimaAtualizacao: new Date()
       }
     });
-
   } catch (error) {
     console.error('❌ Erro ao buscar stats:', error);
     res.status(500).json({
@@ -83,8 +85,8 @@ export const getStats = async (req, res) => {
 // Pesquisar documentos
 export const searchDocuments = async (req, res) => {
   try {
-    const { q } = req.query;
-
+    const { q, tipo_radar = 'parlamento' } = req.query; // ✅ ADICIONAR tipo_radar
+    
     if (!q) {
       return res.status(400).json({
         success: false,
@@ -92,9 +94,9 @@ export const searchDocuments = async (req, res) => {
       });
     }
 
-    // Buscar todos documentos do parlamento
+    // Buscar todos documentos do tipo especificado
     const todos = await Document.find({
-      tipo_radar: 'parlamento', // ← FILTRAR APENAS PARLAMENTO
+      tipo_radar, // ✅ USAR O PARÂMETRO DINÂMICO
       limit: 1000
     });
 
@@ -108,9 +110,8 @@ export const searchDocuments = async (req, res) => {
     res.json({
       success: true,
       count: documentos.length,
-      data: documentos.slice(0, 50) // ← Retornar top 50 resultados
+      data: documentos.slice(0, 50)
     });
-
   } catch (error) {
     console.error('Erro ao pesquisar:', error);
     res.status(500).json({
