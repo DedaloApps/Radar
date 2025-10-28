@@ -222,18 +222,35 @@ const STAKEHOLDERS_CONFIG = {
   // AGRICULTURA
   dgadr: {
     url: "https://www.dgadr.gov.pt/pt/destaques",
+    baseUrl: "https://www.dgadr.gov.pt",
     nome: "DGADR",
     categoria: "stake_agricultura",
-    seletor: ".destaque-item a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".page-header h2 a",                    // ✅ Seletor correto confirmado
+      "h2[itemprop='name'] a",                // Fallback 1
+      ".jl-article h2 a",                     // Fallback 2
+    ],
+    seletorData: "meta[property='datePublished']", // Data: "2025-10-24T12:24:33+01:00"
+    seletorResumo: "[property='text'] p",     // Resumo do artigo
     tipo_conteudo: "destaque",
   },
   iniav: {
     url: "https://www.iniav.pt/divulgacao/noticias-iniav",
+    baseUrl: "https://www.iniav.pt",
     nome: "INIAV",
     categoria: "stake_agricultura",
-    seletor: ".news-title a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".article-header h2 a",                 // ✅ Seletor correto confirmado
+      ".article h2 a",                        // Fallback 1
+      "[itemprop='blogPost'] h2 a",           // Fallback 2
+    ],
+    seletorData: "time[datetime]",            // Data: "2025-10-23T10:04:43+01:00"
+    seletorResumo: ".article-introtext p",    // Resumo da notícia
     tipo_conteudo: "noticia",
   },
+
 
   // ECONOMIA/FINANÇAS
   iapmei: {
