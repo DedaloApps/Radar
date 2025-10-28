@@ -377,6 +377,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.ers.pt/pt/comunicacao/noticias-1/",
     nome: "ERS",
     categoria: "stake_saude",
+    ignorarSSL: true,  // ERS tem problema de certificado
     seletor: ".noticia-titulo a",
     tipo_conteudo: "noticia",
   },
