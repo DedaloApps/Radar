@@ -9,15 +9,14 @@ const STAKEHOLDERS_CONFIG = {
   // CONCERTAÇÃO SOCIAL
   cgtp: {
     url: "https://www.cgtp.pt/accao-e-luta",
-    rss: "https://www.cgtp.pt/rss.xml", // Tentar RSS primeiro
+    rss: "https://www.cgtp.pt/rss.xml",
     nome: "CGTP-IN",
     categoria: "stake_concertacao",
-    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".page-header h2 a",              // ✅ Seletor correto confirmado
-      "h2[itemprop='headline'] a",      // Fallback 1
-      ".blog-item h2 a",                // Fallback 2
-      "h2 a[href*='/accao-e-luta/']",   // Fallback 3
+      ".page-header h2 a",
+      "h2[itemprop='headline'] a",
+      ".blog-item h2 a",
+      "h2 a[href*='/accao-e-luta/']",
     ],
     seletorData: ".article-info time, time[datetime]",
     seletorResumo: ".item-content p, .article-intro",
@@ -25,92 +24,106 @@ const STAKEHOLDERS_CONFIG = {
   },
   ugt: {
     url: "https://www.ugt.pt/noticias",
-    rss: "https://www.ugt.pt/feed", // Tentar RSS
+    rss: "https://www.ugt.pt/feed",
     nome: "UGT",
     categoria: "stake_concertacao",
-    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".title h6 a",                    // ✅ Seletor correto confirmado
-      "article.item .title a",          // Fallback 1
-      ".col-md-6 article .title a",     // Fallback 2
+      ".title h6 a",
+      "article.item .title a",
+      ".col-md-6 article .title a",
     ],
-    seletorData: ".date p",              // Data: "22 outubro 2025"
-    seletorTags: ".tags .tag",           // Tags da notícia
-    seletorCategoria: ".tags__category .tag",  // Categoria
+    seletorData: ".date p",
+    seletorTags: ".tags .tag",
+    seletorCategoria: ".tags__category .tag",
     tipo_conteudo: "noticia",
   },
   cap: {
     url: "https://www.cap.pt/noticias-cap",
-    rss: "https://www.cap.pt/feed", // Tentar RSS
+    rss: "https://www.cap.pt/feed",
     nome: "CAP",
     categoria: "stake_concertacao",
-    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".article-link",                  // ✅ Seletor correto confirmado
-      ".card-body.article-body a.article-link", // Fallback 1
-      "h3.article-title",               // Fallback 2 (pegar texto do h3)
+      ".article-link",
+      ".card-body.article-body a.article-link",
+      "h3.article-title",
     ],
-    seletorData: ".article-time",       // Data: "22 out 2025"
-    seletorResumo: ".article-excerpt",  // Resumo da notícia
+    seletorData: ".article-time",
+    seletorResumo: ".article-excerpt",
     tipo_conteudo: "noticia",
   },
   ccp: {
     url: "https://ccp.pt/noticias/",
-    rss: "https://ccp.pt/feed", // Tentar RSS
+    rss: "https://ccp.pt/feed",
     nome: "CCP",
     categoria: "stake_concertacao",
-    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".card-title a",                  // ✅ Seletor correto confirmado
-      "h5.card-title a",                // Fallback 1
-      ".grid-item .card-title a",       // Fallback 2
+      ".card-title a",
+      "h5.card-title a",
+      ".grid-item .card-title a",
     ],
-    seletorData: ".card-date",          // Data: "24 de Outubro, 2025"
-    seletorResumo: ".card-text",        // Resumo da notícia
+    seletorData: ".card-date",
+    seletorResumo: ".card-text",
     tipo_conteudo: "noticia",
   },
   ctp: {
     url: "https://ctp.org.pt/noticias",
-    rss: "https://ctp.org.pt/feed", // Tentar RSS
+    rss: "https://ctp.org.pt/feed",
     nome: "CTP",
     categoria: "stake_concertacao",
-    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      "a.title",                        // ✅ Seletor correto confirmado
-      ".info a.title",                  // Fallback 1
-      ".article .info .title",          // Fallback 2
+      "a.title",
+      ".info a.title",
+      ".article .info .title",
     ],
-    seletorData: ".info > p",           // Data: "24/10/2025" (primeiro p)
-    seletorResumo: ".description, p.description", // Resumo da notícia
+    seletorData: ".info > p",
+    seletorResumo: ".description, p.description",
     tipo_conteudo: "noticia",
   },
 
-  // LABORAL
+  // ✅ LABORAL - CORRIGIDO
   act: {
-    url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx#1",
+    url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx",
+    baseUrl: "https://portal.act.gov.pt",
     nome: "ACT",
     categoria: "stake_laboral",
-    seletores: [".ms-vb a", "article a", ".news-item a"],
-    seletorData: ".ms-vb-lastmod, .date, time",
-    seletorResumo: ".ms-vb-brief, p",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".dvNewsTitulo a",                  // ✅ Seletor correto confirmado
+      ".dvNew .dvNewsTitulo a",           // Fallback 1
+      ".col-md-12.dvNewsTitulo a",        // Fallback 2
+    ],
+    seletorData: ".dvNewsData",           // Data: "09/10/2025"
+    seletorResumo: ".dvNewsCorpo",        // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   cite: {
     url: "https://cite.gov.pt/noticias-antigas",
+    baseUrl: "https://cite.gov.pt",
     nome: "CITE",
     categoria: "stake_laboral",
-    seletores: [".entry-title a", "article h2 a", ".news-title a"],
-    seletorData: ".entry-date, time, .published",
-    seletorResumo: ".entry-summary, p",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".span9 a span",                    // ✅ Seletor correto confirmado (título no span)
+      ".row-fluid .span9 a",              // Fallback 1
+      "a[title*='Conferência']",          // Fallback 2
+    ],
+    seletorData: ".span9 p",              // Data: "28-10-2025" (primeiro p)
+    seletorResumo: ".span9 p:nth-of-type(2)", // Resumo (segundo p)
     tipo_conteudo: "noticia",
   },
   aima: {
     url: "https://aima.gov.pt/pt/noticias",
+    baseUrl: "https://aima.gov.pt",
     nome: "AIMA",
     categoria: "stake_laboral",
-    seletores: [".news-item h3 a", "article a", ".noticia a"],
-    seletorData: ".news-date, time, .published",
-    seletorResumo: ".news-summary, p",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".uk-h4 a",                         // ✅ Seletor correto confirmado
+      "h3.uk-h4 a.uk-link-reset",         // Fallback 1
+      ".uk-card h3 a",                    // Fallback 2
+    ],
+    seletorData: ".uk-text-meta",         // Data: "24.10.2025"
+    seletorResumo: ".uk-h4 a",            // AIMA não tem resumo, usar título
     tipo_conteudo: "noticia",
   },
 
@@ -230,175 +243,90 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.infarmed.pt/web/infarmed/noticias",
     nome: "INFARMED",
     categoria: "stake_saude",
-    seletor: ".news-item h3 a",
+    seletor: ".news-title a",
     tipo_conteudo: "noticia",
   },
   ers: {
-    url: "https://www.ers.pt/pt/comunicacao/noticias/",
+    url: "https://www.ers.pt/pt/comunicacao/noticias-1/",
     nome: "ERS",
     categoria: "stake_saude",
     seletor: ".noticia-titulo a",
     tipo_conteudo: "noticia",
   },
   igas: {
-    url: "https://www.igas.min-saude.pt/category/noticias-e-eventos/noticias/",
+    url: "https://www.igas.min-saude.pt/comunicacao/destaques/",
     nome: "IGAS",
     categoria: "stake_saude",
-    seletor: ".entry-title a",
-    tipo_conteudo: "noticia",
+    seletor: ".destaque-link",
+    tipo_conteudo: "destaque",
   },
 
   // IMOBILIÁRIO/HABITAÇÃO
   cmvm: {
-    url: "https://www.cmvm.pt/PInstitucional/Content?Input=E9639BDA21F5F3D13613E5F7C187F1A785B6EE9D48F21D9B121B7E5EC2D6A6F5",
+    url: "https://www.cmvm.pt/pt/Comunicados/Paginas/Index.aspx",
     nome: "CMVM",
     categoria: "stake_imobiliario",
-    seletor: ".comunicado a",
+    seletor: ".comunicado-link",
     tipo_conteudo: "comunicado",
   },
   dgterritorio: {
-    url: "https://www.dgterritorio.gov.pt/todas-noticias",
+    url: "https://www.dgterritorio.gov.pt/noticias",
     nome: "DGTerritório",
     categoria: "stake_imobiliario",
-    seletor: ".news-title a",
+    seletor: ".news-item a",
     tipo_conteudo: "noticia",
   },
   ihru: {
-    url: "https://www.ihru.pt/noticias",
+    url: "https://www.ihru.pt/web/guest/noticias",
     nome: "IHRU",
     categoria: "stake_imobiliario",
-    seletor: ".noticia-item a",
+    seletor: ".portlet-title a",
     tipo_conteudo: "noticia",
   },
 };
 
 // ============================================
-// FUNÇÕES HELPER
+// FUNÇÕES AUXILIARES
 // ============================================
 
-function limparUrl(urlBase, urlRelativo) {
-  if (!urlRelativo) return "";
-  urlRelativo = urlRelativo.trim();
-
-  if (urlRelativo.startsWith("http://") || urlRelativo.startsWith("https://")) {
-    return urlRelativo;
-  }
-
-  if (urlRelativo.startsWith("//")) {
-    return `https:${urlRelativo}`;
-  }
-
-  if (urlRelativo.startsWith("/")) {
-    const dominio = new URL(urlBase).origin;
-    return `${dominio}${urlRelativo}`;
-  }
-
-  return `${urlBase}/${urlRelativo}`;
-}
-
-function extrairData($, element) {
-  // Tentar encontrar data em vários formatos comuns
-  const dataTexto = $(element)
-    .find(".data, .date, time, .published")
-    .first()
-    .text()
-    .trim();
-
-  if (dataTexto) {
-    // Converter para ISO se possível
-    try {
-      const data = new Date(dataTexto);
-      if (!isNaN(data.getTime())) {
-        return data.toISOString().split("T")[0];
-      }
-    } catch (e) {
-      // Ignorar erros de parsing
-    }
-  }
-
-  // Default: data de hoje
-  return new Date().toISOString().split("T")[0];
+function limparUrl(baseUrl, url) {
+  if (!url) return null;
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("//")) return `https:${url}`;
+  if (url.startsWith("/")) return new URL(url, baseUrl).href;
+  return new URL(url, baseUrl).href;
 }
 
 // ============================================
-// SCRAPER GENÉRICO MELHORADO
+// SCRAPER DE UM STAKEHOLDER
 // ============================================
-
-// User-Agents variados para evitar bloqueios
-const USER_AGENTS = [
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
-];
-
-function getRandomUserAgent() {
-  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
-}
 
 async function scrapeStakeholder(stakeholderId, config) {
-  console.log(`\n🔍 Scraping ${config.nome} (${stakeholderId})...`);
+  console.log(`\n📡 ${config.nome} (${stakeholderId})`);
   console.log(`   URL: ${config.url}`);
 
-  // Tentar com retry (até 3 tentativas)
+  // Tentar 3 vezes antes de desistir
   for (let tentativa = 1; tentativa <= 3; tentativa++) {
     try {
-      if (tentativa > 1) {
-        console.log(`   🔄 Tentativa ${tentativa}/3...`);
-        // Delay maior entre retries
-        await new Promise(resolve => setTimeout(resolve, 3000 * tentativa));
-      }
-
       const response = await axios.get(config.url, {
         headers: {
-          "User-Agent": getRandomUserAgent(),
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-          "Accept-Language": "pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-          "Accept-Encoding": "gzip, deflate, br",
-          "DNT": "1",
-          "Connection": "keep-alive",
-          "Upgrade-Insecure-Requests": "1",
-          "Sec-Fetch-Dest": "document",
-          "Sec-Fetch-Mode": "navigate",
-          "Sec-Fetch-Site": "none",
-          "Sec-Fetch-User": "?1",
-          "Cache-Control": "max-age=0",
-          "Referer": new URL(config.url).origin,
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "pt-PT,pt;q=0.9,en;q=0.8",
         },
-        timeout: 20000,
-        maxRedirects: 5,
-        validateStatus: (status) => status < 500, // Aceitar 4xx para tratar depois
+        timeout: 15000,
       });
-
-      // Verificar status
-      if (response.status === 403) {
-        if (tentativa < 3) {
-          console.log(`   ⚠️  Status 403 - Tentando novamente...`);
-          continue; // Tentar próxima iteração
-        }
-        throw new Error('Status 403 - Acesso negado após 3 tentativas');
-      }
-
-      if (response.status === 404) {
-        console.error(`  ❌ Página não encontrada (404)`);
-        return 0;
-      }
-
-      if (response.status >= 400) {
-        throw new Error(`Status HTTP ${response.status}`);
-      }
 
       const $ = cheerio.load(response.data);
       const documentos = [];
       let seletorUsado = null;
 
-      // Suportar configuração antiga (seletor único) e nova (múltiplos seletores)
-      const seletores = config.seletores || [config.seletor];
-
       // Tentar cada seletor até encontrar resultados
+      const seletores = Array.isArray(config.seletores) ? config.seletores : [config.seletor];
+      
       for (const seletor of seletores) {
         const elementos = $(seletor);
+        
         if (elementos.length > 0) {
           console.log(`   ✓ Seletor funcionou: "${seletor}" (${elementos.length} elementos)`);
           seletorUsado = seletor;
@@ -411,12 +339,13 @@ async function scrapeStakeholder(stakeholderId, config) {
             const url = $link.attr("href");
 
             if (titulo && url && titulo.length > 10) {
-              const urlCompleta = limparUrl(config.url, url);
+              const baseUrl = config.baseUrl || config.url;
+              const urlCompleta = limparUrl(baseUrl, url);
 
-              // Extrair data se existir seletor
+              // Extrair data
               let data = new Date().toISOString().split("T")[0];
               if (config.seletorData) {
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div");
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card");
                 const dataTexto = $container.find(config.seletorData).first().text().trim();
                 if (dataTexto) {
                   const dataParsed = parseData(dataTexto);
@@ -424,10 +353,10 @@ async function scrapeStakeholder(stakeholderId, config) {
                 }
               }
 
-              // Extrair resumo se existir seletor
+              // Extrair resumo
               let resumo = titulo.substring(0, 200);
               if (config.seletorResumo) {
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div");
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card");
                 const resumoTexto = $container.find(config.seletorResumo).first().text().trim();
                 if (resumoTexto && resumoTexto.length > 20) {
                   resumo = resumoTexto.substring(0, 300);
@@ -441,33 +370,32 @@ async function scrapeStakeholder(stakeholderId, config) {
                 titulo: titulo,
                 data_publicacao: data,
                 url: urlCompleta,
-                fonte: "stakeholders",  // Valor genérico (como "parlamento")
-                entidades: config.nome,  // Nome específico (ex: "CGTP-IN", "UGT")
+                fonte: "stakeholders",
+                entidades: config.nome,
                 resumo: resumo,
               });
             }
           });
 
-          break; // Encontrou resultados, não precisa testar outros seletores
+          break; // Encontrou resultados
         } else {
           console.log(`   ✗ Seletor sem resultados: "${seletor}"`);
         }
       }
 
       if (documentos.length === 0) {
-        console.log(`  ⚠️  Nenhum documento encontrado com os seletores configurados`);
+        console.log(`  ⚠️  Nenhum documento encontrado`);
         return 0;
       }
 
-      console.log(`  📊 Encontrados: ${documentos.length} documentos (seletor: "${seletorUsado}")`);
+      console.log(`  📊 Encontrados: ${documentos.length} documentos`);
 
-      // Guardar na base de dados
+      // Guardar na BD
       let novosGuardados = 0;
       let duplicadosIgnorados = 0;
 
       for (const doc of documentos) {
         try {
-          // Verificar se já existe
           const existe = await Document.findOne({ url: doc.url });
 
           if (!existe) {
@@ -490,51 +418,44 @@ async function scrapeStakeholder(stakeholderId, config) {
         }
       }
 
-      console.log(
-        `  ✅ ${config.nome}: ${novosGuardados} novos, ${duplicadosIgnorados} duplicados`
-      );
+      console.log(`  ✅ ${config.nome}: ${novosGuardados} novos, ${duplicadosIgnorados} duplicados`);
       return novosGuardados;
 
     } catch (error) {
-      // Se não for a última tentativa e for erro de conexão, continuar
       if (tentativa < 3 && (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND')) {
         console.log(`   ⚠️  ${error.message} - Tentando novamente...`);
         continue;
       }
 
-      // Última tentativa ou erro não recuperável
       if (tentativa === 3 || error.response?.status === 403) {
         if (error.response?.status === 403) {
-          console.error(`  ❌ Acesso negado (403) para ${config.nome} - site tem proteção anti-scraping forte`);
+          console.error(`  ❌ Acesso negado (403) - site tem proteção anti-scraping`);
         } else if (error.code === 'ECONNABORTED') {
-          console.error(`  ❌ Timeout ao aceder ${config.nome}`);
+          console.error(`  ❌ Timeout`);
         } else if (error.response?.status === 404) {
-          console.error(`  ❌ Página não encontrada (404) para ${config.nome}`);
+          console.error(`  ❌ Página não encontrada (404)`);
         } else {
-          console.error(`  ❌ Erro no scraping de ${config.nome}:`, error.message);
+          console.error(`  ❌ Erro:`, error.message);
         }
         return 0;
       }
     }
   }
 
-  // Se chegou aqui, todas as tentativas falharam
-  console.error(`  ❌ Todas as tentativas falharam para ${config.nome}`);
+  console.error(`  ❌ Todas as tentativas falharam`);
   return 0;
 }
 
-// Função auxiliar para parsing de datas melhorada
+// Função auxiliar para parsing de datas
 function parseData(dataString) {
   if (!dataString) return null;
 
   try {
-    // Remover texto extra e normalizar
     let texto = dataString
       .replace(/publicado em|publicado a|data:|em/gi, "")
-      .replace(/\s+/g, " ")  // Normalizar espaços
+      .replace(/\s+/g, " ")
       .trim();
 
-    // Mapa de meses em português
     const mesesPT = {
       'janeiro': '01', 'jan': '01',
       'fevereiro': '02', 'fev': '02',
@@ -550,7 +471,7 @@ function parseData(dataString) {
       'dezembro': '12', 'dez': '12',
     };
 
-    // Formato: "22 outubro 2025" ou "22 out 2025" (UGT, CGTP, CAP)
+    // "22 outubro 2025"
     const matchPT = texto.match(/(\d{1,2})\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s+(\d{4})/i);
     if (matchPT) {
       const dia = matchPT[1].padStart(2, '0');
@@ -559,7 +480,7 @@ function parseData(dataString) {
       return `${ano}-${mes}-${dia}`;
     }
 
-    // Formato: "24 de Outubro, 2025" (CCP com preposição "de")
+    // "24 de Outubro, 2025"
     const matchPTPrep = texto.match(/(\d{1,2})\s+de\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro),?\s+(\d{4})/i);
     if (matchPTPrep) {
       const dia = matchPTPrep[1].padStart(2, '0');
@@ -568,10 +489,10 @@ function parseData(dataString) {
       return `${ano}-${mes}-${dia}`;
     }
 
-    // Tentar formatos comuns numéricos (inclui CTP: "24/10/2025")
+    // Formatos numéricos: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY
     const regexes = [
-      /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/,  // 15/01/2025 ou 15-01-2025
-      /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/,  // 2025-01-15
+      /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/,
+      /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/,
     ];
 
     for (const regex of regexes) {
@@ -579,10 +500,8 @@ function parseData(dataString) {
       if (match) {
         let ano, mes, dia;
         if (match[1].length === 4) {
-          // Formato YYYY-MM-DD
           [, ano, mes, dia] = match;
         } else {
-          // Formato DD/MM/YYYY
           [, dia, mes, ano] = match;
         }
         const data = new Date(ano, mes - 1, dia);
@@ -592,13 +511,12 @@ function parseData(dataString) {
       }
     }
 
-    // Tentar parseamento direto
     const data = new Date(texto);
     if (!isNaN(data.getTime())) {
       return data.toISOString().split("T")[0];
     }
   } catch (e) {
-    // Ignorar erros
+    // Ignorar
   }
 
   return null;
