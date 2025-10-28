@@ -107,7 +107,7 @@ const STAKEHOLDERS_CONFIG = {
     seletores: [
       ".span9 a",                    // ✅ Seletor correto confirmado (título no span)
       ".row-fluid .span9 a",              // Fallback 1
-      "a[href*="/noticias"]",          // Fallback 2
+      "a[href*='/noticias']",          // Fallback 2
     ],
     seletorData: ".span9 p",              // Data: "28-10-2025" (primeiro p)
     seletorResumo: ".span9 p:nth-of-type(2)", // Resumo (segundo p)
