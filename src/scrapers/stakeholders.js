@@ -435,6 +435,7 @@ async function scrapeStakeholder(stakeholderId, config) {
 
   // Tentar 3 vezes antes de desistir
   for (let tentativa = 1; tentativa <= 3; tentativa++) {
+    try {
       const axiosConfig = {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -449,7 +450,6 @@ async function scrapeStakeholder(stakeholderId, config) {
       }
       
       const response = await axios.get(config.url, axiosConfig);
-      });
 
       const $ = cheerio.load(response.data);
       const documentos = [];
