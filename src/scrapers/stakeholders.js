@@ -441,8 +441,8 @@ async function scrapeStakeholder(stakeholderId, config) {
                 titulo: titulo,
                 data_publicacao: data,
                 url: urlCompleta,
-                fonte: stakeholderId,
-                entidades: config.nome,
+                fonte: "stakeholders",  // Valor genérico (como "parlamento")
+                entidades: config.nome,  // Nome específico (ex: "CGTP-IN", "UGT")
                 resumo: resumo,
               });
             }
