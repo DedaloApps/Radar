@@ -30,15 +30,15 @@ const STAKEHOLDERS_CONFIG = {
     rss: "https://www.ugt.pt/feed", // Tentar RSS
     nome: "UGT",
     categoria: "concertacao_social",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".col-4 a[href*='/noticias/artigo/']",
-      "article a[href*='/noticias/']",
-      ".news-item a",
-      ".noticia-titulo a",
-      "h3 a, h2 a"
+      ".title h6 a",                    // ✅ Seletor correto confirmado
+      "article.item .title a",          // Fallback 1
+      ".col-md-6 article .title a",     // Fallback 2
     ],
-    seletorData: ".data, .date, time, .published",
-    seletorResumo: ".resumo, .excerpt, p",
+    seletorData: ".date p",              // Data: "22 outubro 2025"
+    seletorTags: ".tags .tag",           // Tags da notícia
+    seletorCategoria: ".tags__category .tag",  // Categoria
     tipo_conteudo: "noticia",
   },
   cap: {
@@ -536,9 +536,35 @@ function parseData(dataString) {
     // Remover texto extra e normalizar
     let texto = dataString
       .replace(/publicado em|publicado a|data:|em/gi, "")
+      .replace(/\s+/g, " ")  // Normalizar espaços
       .trim();
 
-    // Tentar formatos comuns portugueses
+    // Mapa de meses em português
+    const mesesPT = {
+      'janeiro': '01', 'jan': '01',
+      'fevereiro': '02', 'fev': '02',
+      'março': '03', 'mar': '03',
+      'abril': '04', 'abr': '04',
+      'maio': '05', 'mai': '05',
+      'junho': '06', 'jun': '06',
+      'julho': '07', 'jul': '07',
+      'agosto': '08', 'ago': '08',
+      'setembro': '09', 'set': '09',
+      'outubro': '10', 'out': '10',
+      'novembro': '11', 'nov': '11',
+      'dezembro': '12', 'dez': '12',
+    };
+
+    // Formato: "22 outubro 2025" (UGT)
+    const matchPT = texto.match(/(\d{1,2})\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s+(\d{4})/i);
+    if (matchPT) {
+      const dia = matchPT[1].padStart(2, '0');
+      const mes = mesesPT[matchPT[2].toLowerCase()];
+      const ano = matchPT[3];
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    // Tentar formatos comuns numéricos
     const regexes = [
       /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/,  // 15/01/2025 ou 15-01-2025
       /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/,  // 2025-01-15
