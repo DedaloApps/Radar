@@ -59,15 +59,14 @@ const STAKEHOLDERS_CONFIG = {
     rss: "https://ccp.pt/feed", // Tentar RSS
     nome: "CCP",
     categoria: "stake_concertacao",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".post-title a",
-      "article h2 a",
-      ".entry-title a",
-      "h2 a[href*='/noticias/']",
-      ".news-item a"
+      ".card-title a",                  // ✅ Seletor correto confirmado
+      "h5.card-title a",                // Fallback 1
+      ".grid-item .card-title a",       // Fallback 2
     ],
-    seletorData: ".post-date, .entry-date, time, .published",
-    seletorResumo: ".post-excerpt, .entry-summary, p",
+    seletorData: ".card-date",          // Data: "24 de Outubro, 2025"
+    seletorResumo: ".card-text",        // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   ctp: {
@@ -75,15 +74,14 @@ const STAKEHOLDERS_CONFIG = {
     rss: "https://ctp.org.pt/feed", // Tentar RSS
     nome: "CTP",
     categoria: "stake_concertacao",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      "article h2 a",
-      ".entry-title a",
-      ".post-title a",
-      "h3 a[href*='/noticias']",
-      ".news-item a"
+      "a.title",                        // ✅ Seletor correto confirmado
+      ".info a.title",                  // Fallback 1
+      ".article .info .title",          // Fallback 2
     ],
-    seletorData: ".entry-date, .post-date, time, .published",
-    seletorResumo: ".entry-excerpt, .post-excerpt, p",
+    seletorData: ".info > p",           // Data: "24/10/2025" (primeiro p)
+    seletorResumo: ".description, p.description", // Resumo da notícia
     tipo_conteudo: "noticia",
   },
 
@@ -552,7 +550,7 @@ function parseData(dataString) {
       'dezembro': '12', 'dez': '12',
     };
 
-    // Formato: "22 outubro 2025" (UGT)
+    // Formato: "22 outubro 2025" ou "22 out 2025" (UGT, CGTP, CAP)
     const matchPT = texto.match(/(\d{1,2})\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s+(\d{4})/i);
     if (matchPT) {
       const dia = matchPT[1].padStart(2, '0');
@@ -561,7 +559,16 @@ function parseData(dataString) {
       return `${ano}-${mes}-${dia}`;
     }
 
-    // Tentar formatos comuns numéricos
+    // Formato: "24 de Outubro, 2025" (CCP com preposição "de")
+    const matchPTPrep = texto.match(/(\d{1,2})\s+de\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro),?\s+(\d{4})/i);
+    if (matchPTPrep) {
+      const dia = matchPTPrep[1].padStart(2, '0');
+      const mes = mesesPT[matchPTPrep[2].toLowerCase()];
+      const ano = matchPTPrep[3];
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    // Tentar formatos comuns numéricos (inclui CTP: "24/10/2025")
     const regexes = [
       /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/,  // 15/01/2025 ou 15-01-2025
       /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/,  // 2025-01-15
