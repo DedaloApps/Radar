@@ -252,56 +252,114 @@ const STAKEHOLDERS_CONFIG = {
   },
 
 
+
   // ECONOMIA/FINANÇAS
   iapmei: {
     url: "https://www.iapmei.pt/NOTICIAS.aspx",
+    baseUrl: "https://www.iapmei.pt",
     nome: "IAPMEI",
     categoria: "stake_economia",
-    seletor: ".noticia-link",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".contain h1 a",                        // ✅ Seletor correto confirmado
+      ".col-lg-3 h1 a",                       // Fallback 1
+      ".contain a[href*='/NOTICIAS/']",       // Fallback 2
+    ],
+    seletorData: ".data",                     // Data: "27-10-2025"
+    seletorResumo: ".contain p",              // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   concorrencia: {
     url: "https://www.concorrencia.pt/pt/noticias-comunicados-e-intervencoes",
+    baseUrl: "https://www.concorrencia.pt",
     nome: "AdC",
     categoria: "stake_economia",
-    seletor: ".views-row h3 a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".text-wrapper a",                      // Link wrapper (assumindo que existe)
+      ".title a",                             // Fallback 1  
+      "a[href*='/noticias-comunicados']",     // Fallback 2
+    ],
+    seletorData: ".text-wrapper .date",       // Data: "23-10-2025"
+    seletorResumo: ".title",                  // AdC não tem resumo separado, usar título
     tipo_conteudo: "comunicado",
   },
   aduaneiro: {
     url: "https://info-aduaneiro.portaldasfinancas.gov.pt/pt/noticias/Pages/noticias.aspx",
+    baseUrl: "https://info-aduaneiro.portaldasfinancas.gov.pt",
     nome: "AT Aduaneiro",
     categoria: "stake_economia",
-    seletor: ".ms-vb a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".col-sm-9 a.more-btn",                 // ✅ Link "Ver mais"
+      "a.more-btn",                           // Fallback 1
+      ".col-sm-9 a",                          // Fallback 2
+    ],
+    seletorData: ".col-sm-9",                 // AT Aduaneiro não tem data visível
+    seletorResumo: ".col-sm-9 p",             // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   bportugal: {
     url: "https://www.bportugal.pt/comunicados/media/banco-de-portugal",
+    baseUrl: "https://www.bportugal.pt",
     nome: "Banco de Portugal",
     categoria: "stake_economia",
-    seletor: ".comunicado-titulo a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".content-container--slide-title--span", // ✅ Seletor correto confirmado
+      ".bdpsi-h6 .content-container--slide-title--span", // Fallback 1
+      ".content-container--link-container",   // Fallback 2
+    ],
+    seletorData: ".content-container--slide-date", // Data: "27-10-2025"
+    seletorResumo: ".content-container--slide-title--span", // Banco Portugal não tem resumo, usar título
     tipo_conteudo: "comunicado",
   },
   portugalglobal: {
     url: "https://portugalglobal.pt/noticias/",
+    baseUrl: "https://portugalglobal.pt",
     nome: "Portugal Global",
     categoria: "stake_economia",
-    seletor: ".news-item h3 a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".readingTextCard__content a",          // Link no card
+      ".readingTextCard a",                   // Fallback 1
+      ".btn--tertiary",                       // Fallback 2 (botão "Ver mais")
+    ],
+    seletorData: ".readingImageCard__infoItem", // Data: "31/10/2025"
+    seletorResumo: ".readingTextCard__description", // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   consumidor: {
     url: "https://www.consumidor.gov.pt/comunicacao1/noticias1?page=1",
+    baseUrl: "https://www.consumidor.gov.pt",
     nome: "Portal Consumidor",
     categoria: "stake_economia",
-    seletor: ".noticia-titulo a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".MainCard2__content a",                // Link no card
+      ".card-body a",                         // Fallback 1
+      "a[href*='/comunicacao1/noticias1/']",  // Fallback 2
+    ],
+    seletorData: ".MainCard2__contentDate",   // Data: "2025-10-28"
+    seletorResumo: ".MainCard2__contentText", // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   dgae: {
     url: "https://www.dgae.gov.pt/comunicacao/noticias.aspx",
+    baseUrl: "https://www.dgae.gov.pt",
     nome: "DGAE",
     categoria: "stake_economia",
-    seletor: ".news-title a",
+    // ✅ Seletores baseados em HTML real
+    seletores: [
+      ".register-title a",                    // ✅ Seletor correto confirmado
+      ".register .register-title a",          // Fallback 1
+      "a[href*='comunicacao/noticias/']",     // Fallback 2
+    ],
+    seletorData: ".register-date",            // Data: "2025-10-28"
+    seletorResumo: ".register-text",          // Resumo da notícia
     tipo_conteudo: "noticia",
   },
+
 
   // SAÚDE
   infarmed: {
