@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import Document from "../models/Document.js";
-const https = require("https");
+import https from "https";
 
 // ============================================
 // CONFIGURAÇÃO DOS STAKEHOLDERS
