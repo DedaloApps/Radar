@@ -11,7 +11,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.cgtp.pt/accao-e-luta",
     rss: "https://www.cgtp.pt/rss.xml", // Tentar RSS primeiro
     nome: "CGTP-IN",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
     // Múltiplos seletores como fallback
     seletores: [
       ".entry-title a",
@@ -29,7 +29,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.ugt.pt/noticias",
     rss: "https://www.ugt.pt/feed", // Tentar RSS
     nome: "UGT",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
     // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
       ".title h6 a",                    // ✅ Seletor correto confirmado
@@ -45,7 +45,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.cap.pt/noticias-cap",
     rss: "https://www.cap.pt/feed", // Tentar RSS
     nome: "CAP",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
     seletores: [
       ".noticia-titulo a",
       "article h2 a",
@@ -61,7 +61,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://ccp.pt/noticias/",
     rss: "https://ccp.pt/feed", // Tentar RSS
     nome: "CCP",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
     seletores: [
       ".post-title a",
       "article h2 a",
@@ -77,7 +77,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://ctp.org.pt/noticias",
     rss: "https://ctp.org.pt/feed", // Tentar RSS
     nome: "CTP",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
     seletores: [
       "article h2 a",
       ".entry-title a",
@@ -94,7 +94,7 @@ const STAKEHOLDERS_CONFIG = {
   act: {
     url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx#1",
     nome: "ACT",
-    categoria: "laboral",
+    categoria: "stake_laboral",
     seletores: [".ms-vb a", "article a", ".news-item a"],
     seletorData: ".ms-vb-lastmod, .date, time",
     seletorResumo: ".ms-vb-brief, p",
@@ -103,7 +103,7 @@ const STAKEHOLDERS_CONFIG = {
   cite: {
     url: "https://cite.gov.pt/noticias-antigas",
     nome: "CITE",
-    categoria: "laboral",
+    categoria: "stake_laboral",
     seletores: [".entry-title a", "article h2 a", ".news-title a"],
     seletorData: ".entry-date, time, .published",
     seletorResumo: ".entry-summary, p",
@@ -112,7 +112,7 @@ const STAKEHOLDERS_CONFIG = {
   aima: {
     url: "https://aima.gov.pt/pt/noticias",
     nome: "AIMA",
-    categoria: "laboral",
+    categoria: "stake_laboral",
     seletores: [".news-item h3 a", "article a", ".noticia a"],
     seletorData: ".news-date, time, .published",
     seletorResumo: ".news-summary, p",
@@ -123,42 +123,42 @@ const STAKEHOLDERS_CONFIG = {
   apambiente: {
     url: "https://apambiente.pt/destaques",
     nome: "APA",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".destaque-titulo a",
     tipo_conteudo: "destaque",
   },
   igamaot: {
     url: "https://www.igamaot.gov.pt/pt/espaco-publico/destaques#1",
     nome: "IGAMAOT",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".ms-vb a",
     tipo_conteudo: "destaque",
   },
   dgav: {
     url: "https://www.dgav.pt/destaques/noticias/",
     nome: "DGAV",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".entry-title a",
     tipo_conteudo: "noticia",
   },
   dgeg: {
     url: "https://www.dgeg.gov.pt/pt/destaques/",
     nome: "DGEG",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".news-item h3 a",
     tipo_conteudo: "destaque",
   },
   adene: {
     url: "https://www.adene.pt/comunicacao/noticias/",
     nome: "ADENE",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".noticia a",
     tipo_conteudo: "noticia",
   },
   erse: {
     url: "https://www.erse.pt/comunicacao/destaques/",
     nome: "ERSE",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".destaque h3 a",
     tipo_conteudo: "destaque",
   },
@@ -167,14 +167,14 @@ const STAKEHOLDERS_CONFIG = {
   dgadr: {
     url: "https://www.dgadr.gov.pt/pt/destaques",
     nome: "DGADR",
-    categoria: "agricultura",
+    categoria: "stake_agricultura",
     seletor: ".destaque-item a",
     tipo_conteudo: "destaque",
   },
   iniav: {
     url: "https://www.iniav.pt/divulgacao/noticias-iniav",
     nome: "INIAV",
-    categoria: "agricultura",
+    categoria: "stake_agricultura",
     seletor: ".news-title a",
     tipo_conteudo: "noticia",
   },
@@ -183,49 +183,49 @@ const STAKEHOLDERS_CONFIG = {
   iapmei: {
     url: "https://www.iapmei.pt/NOTICIAS.aspx",
     nome: "IAPMEI",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".noticia-link",
     tipo_conteudo: "noticia",
   },
   concorrencia: {
     url: "https://www.concorrencia.pt/pt/noticias-comunicados-e-intervencoes",
     nome: "AdC",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".views-row h3 a",
     tipo_conteudo: "comunicado",
   },
   aduaneiro: {
     url: "https://info-aduaneiro.portaldasfinancas.gov.pt/pt/noticias/Pages/noticias.aspx",
     nome: "AT Aduaneiro",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".ms-vb a",
     tipo_conteudo: "noticia",
   },
   bportugal: {
     url: "https://www.bportugal.pt/comunicados/media/banco-de-portugal",
     nome: "Banco de Portugal",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".comunicado-titulo a",
     tipo_conteudo: "comunicado",
   },
   portugalglobal: {
     url: "https://portugalglobal.pt/noticias/",
     nome: "Portugal Global",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".news-item h3 a",
     tipo_conteudo: "noticia",
   },
   consumidor: {
     url: "https://www.consumidor.gov.pt/comunicacao1/noticias1?page=1",
     nome: "Portal Consumidor",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".noticia-titulo a",
     tipo_conteudo: "noticia",
   },
   dgae: {
     url: "https://www.dgae.gov.pt/comunicacao/noticias.aspx",
     nome: "DGAE",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".news-title a",
     tipo_conteudo: "noticia",
   },
@@ -234,21 +234,21 @@ const STAKEHOLDERS_CONFIG = {
   infarmed: {
     url: "https://www.infarmed.pt/web/infarmed/noticias",
     nome: "INFARMED",
-    categoria: "saude",
+    categoria: "stake_saude",
     seletor: ".news-item h3 a",
     tipo_conteudo: "noticia",
   },
   ers: {
     url: "https://www.ers.pt/pt/comunicacao/noticias/",
     nome: "ERS",
-    categoria: "saude",
+    categoria: "stake_saude",
     seletor: ".noticia-titulo a",
     tipo_conteudo: "noticia",
   },
   igas: {
     url: "https://www.igas.min-saude.pt/category/noticias-e-eventos/noticias/",
     nome: "IGAS",
-    categoria: "saude",
+    categoria: "stake_saude",
     seletor: ".entry-title a",
     tipo_conteudo: "noticia",
   },
@@ -257,21 +257,21 @@ const STAKEHOLDERS_CONFIG = {
   cmvm: {
     url: "https://www.cmvm.pt/PInstitucional/Content?Input=E9639BDA21F5F3D13613E5F7C187F1A785B6EE9D48F21D9B121B7E5EC2D6A6F5",
     nome: "CMVM",
-    categoria: "imobiliario_habitacao",
+    categoria: "stake_imobiliario",
     seletor: ".comunicado a",
     tipo_conteudo: "comunicado",
   },
   dgterritorio: {
     url: "https://www.dgterritorio.gov.pt/todas-noticias",
     nome: "DGTerritório",
-    categoria: "imobiliario_habitacao",
+    categoria: "stake_imobiliario",
     seletor: ".news-title a",
     tipo_conteudo: "noticia",
   },
   ihru: {
     url: "https://www.ihru.pt/noticias",
     nome: "IHRU",
-    categoria: "imobiliario_habitacao",
+    categoria: "stake_imobiliario",
     seletor: ".noticia-item a",
     tipo_conteudo: "noticia",
   },
