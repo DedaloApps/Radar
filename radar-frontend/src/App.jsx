@@ -86,7 +86,7 @@ function AppContent() {
       </div>
 
       <div className="absolute inset-0 pt-24">
-        <RadarFullScreen stats={stats} documents={documents} />
+        <RadarFullScreen stats={stats} documents={documents} tipoRadar={tipoRadar} />
       </div>
 
       {/* Modais */}

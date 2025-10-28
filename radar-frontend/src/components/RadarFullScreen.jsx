@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { getCategoriaInfo } from "../utils/categories";
+import { getStakeholderInfo } from "../utils/stakeholders";
 import { BoltIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useUser } from "../contexts/UserContext";
 import DocumentDetailModal from "./DocumentDetailModal";
 import CategoryDocumentsModal from "./CategoryDocumentsModal";
 
-const RadarFullScreen = ({ stats, documents }) => {
+const RadarFullScreen = ({ stats, documents, tipoRadar }) => {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const { categoriasFavoritas, tiposConteudoVisiveis, foiLido, estaArquivado } = useUser();
+  const { categoriasFavoritas, stakeholdersFavoritos, tiposConteudoVisiveis, foiLido, estaArquivado } = useUser();
 
-  // Filtrar apenas categorias favoritas
-  const categoriasList = categoriasFavoritas;
+  // Filtrar apenas categorias favoritas baseado no tipo de radar
+  const categoriasList = tipoRadar === 'stakeholders' ? stakeholdersFavoritos : categoriasFavoritas;
   const angleStep = 360 / categoriasList.length;
 
   // Filtrar documentos por tipo de conteúdo visível
@@ -177,7 +178,7 @@ const RadarFullScreen = ({ stats, documents }) => {
       {/* CATEGORIAS - Cards com NOVAS CORES */}
       {categoriasList.map((categoria, index) => {
         const angle = (angleStep * index - 90) * (Math.PI / 180);
-        const info = getCategoriaInfo(categoria);
+        const info = tipoRadar === 'stakeholders' ? getStakeholderInfo(categoria) : getCategoriaInfo(categoria);
         const { total, documents: categoryDocs, activeCount } = getCategoryData(categoria);
         const Icon = info.icon;
 
