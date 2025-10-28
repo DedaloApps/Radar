@@ -11,25 +11,23 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.cgtp.pt/accao-e-luta",
     rss: "https://www.cgtp.pt/rss.xml", // Tentar RSS primeiro
     nome: "CGTP-IN",
-    categoria: "concertacao_social",
-    // Múltiplos seletores como fallback
+    categoria: "stake_concertacao",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".entry-title a",
-      "article h2 a",
-      ".post-title a",
-      "h2 a[href*='/accao-e-luta/']",
-      ".content-item a",
-      "a[href*='/accao-e-luta/']"
+      ".page-header h2 a",              // ✅ Seletor correto confirmado
+      "h2[itemprop='headline'] a",      // Fallback 1
+      ".blog-item h2 a",                // Fallback 2
+      "h2 a[href*='/accao-e-luta/']",   // Fallback 3
     ],
-    seletorData: ".entry-date, .post-date, time, .published",
-    seletorResumo: ".entry-summary, .entry-content, .excerpt, p",
+    seletorData: ".article-info time, time[datetime]",
+    seletorResumo: ".item-content p, .article-intro",
     tipo_conteudo: "noticia",
   },
   ugt: {
     url: "https://www.ugt.pt/noticias",
     rss: "https://www.ugt.pt/feed", // Tentar RSS
     nome: "UGT",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
     // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
       ".title h6 a",                    // ✅ Seletor correto confirmado
@@ -45,48 +43,45 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.cap.pt/noticias-cap",
     rss: "https://www.cap.pt/feed", // Tentar RSS
     nome: "CAP",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".noticia-titulo a",
-      "article h2 a",
-      ".news-title a",
-      "h3 a[href*='/noticias-']",
-      ".content-item a"
+      ".article-link",                  // ✅ Seletor correto confirmado
+      ".card-body.article-body a.article-link", // Fallback 1
+      "h3.article-title",               // Fallback 2 (pegar texto do h3)
     ],
-    seletorData: ".data, .date, time, .published",
-    seletorResumo: ".noticia-resumo, .excerpt, p",
+    seletorData: ".article-time",       // Data: "22 out 2025"
+    seletorResumo: ".article-excerpt",  // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   ccp: {
     url: "https://ccp.pt/noticias/",
     rss: "https://ccp.pt/feed", // Tentar RSS
     nome: "CCP",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".post-title a",
-      "article h2 a",
-      ".entry-title a",
-      "h2 a[href*='/noticias/']",
-      ".news-item a"
+      ".card-title a",                  // ✅ Seletor correto confirmado
+      "h5.card-title a",                // Fallback 1
+      ".grid-item .card-title a",       // Fallback 2
     ],
-    seletorData: ".post-date, .entry-date, time, .published",
-    seletorResumo: ".post-excerpt, .entry-summary, p",
+    seletorData: ".card-date",          // Data: "24 de Outubro, 2025"
+    seletorResumo: ".card-text",        // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   ctp: {
     url: "https://ctp.org.pt/noticias",
     rss: "https://ctp.org.pt/feed", // Tentar RSS
     nome: "CTP",
-    categoria: "concertacao_social",
+    categoria: "stake_concertacao",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      "article h2 a",
-      ".entry-title a",
-      ".post-title a",
-      "h3 a[href*='/noticias']",
-      ".news-item a"
+      "a.title",                        // ✅ Seletor correto confirmado
+      ".info a.title",                  // Fallback 1
+      ".article .info .title",          // Fallback 2
     ],
-    seletorData: ".entry-date, .post-date, time, .published",
-    seletorResumo: ".entry-excerpt, .post-excerpt, p",
+    seletorData: ".info > p",           // Data: "24/10/2025" (primeiro p)
+    seletorResumo: ".description, p.description", // Resumo da notícia
     tipo_conteudo: "noticia",
   },
 
@@ -94,7 +89,7 @@ const STAKEHOLDERS_CONFIG = {
   act: {
     url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx#1",
     nome: "ACT",
-    categoria: "laboral",
+    categoria: "stake_laboral",
     seletores: [".ms-vb a", "article a", ".news-item a"],
     seletorData: ".ms-vb-lastmod, .date, time",
     seletorResumo: ".ms-vb-brief, p",
@@ -103,7 +98,7 @@ const STAKEHOLDERS_CONFIG = {
   cite: {
     url: "https://cite.gov.pt/noticias-antigas",
     nome: "CITE",
-    categoria: "laboral",
+    categoria: "stake_laboral",
     seletores: [".entry-title a", "article h2 a", ".news-title a"],
     seletorData: ".entry-date, time, .published",
     seletorResumo: ".entry-summary, p",
@@ -112,7 +107,7 @@ const STAKEHOLDERS_CONFIG = {
   aima: {
     url: "https://aima.gov.pt/pt/noticias",
     nome: "AIMA",
-    categoria: "laboral",
+    categoria: "stake_laboral",
     seletores: [".news-item h3 a", "article a", ".noticia a"],
     seletorData: ".news-date, time, .published",
     seletorResumo: ".news-summary, p",
@@ -123,42 +118,42 @@ const STAKEHOLDERS_CONFIG = {
   apambiente: {
     url: "https://apambiente.pt/destaques",
     nome: "APA",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".destaque-titulo a",
     tipo_conteudo: "destaque",
   },
   igamaot: {
     url: "https://www.igamaot.gov.pt/pt/espaco-publico/destaques#1",
     nome: "IGAMAOT",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".ms-vb a",
     tipo_conteudo: "destaque",
   },
   dgav: {
     url: "https://www.dgav.pt/destaques/noticias/",
     nome: "DGAV",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".entry-title a",
     tipo_conteudo: "noticia",
   },
   dgeg: {
     url: "https://www.dgeg.gov.pt/pt/destaques/",
     nome: "DGEG",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".news-item h3 a",
     tipo_conteudo: "destaque",
   },
   adene: {
     url: "https://www.adene.pt/comunicacao/noticias/",
     nome: "ADENE",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".noticia a",
     tipo_conteudo: "noticia",
   },
   erse: {
     url: "https://www.erse.pt/comunicacao/destaques/",
     nome: "ERSE",
-    categoria: "ambiente",
+    categoria: "stake_ambiente",
     seletor: ".destaque h3 a",
     tipo_conteudo: "destaque",
   },
@@ -167,14 +162,14 @@ const STAKEHOLDERS_CONFIG = {
   dgadr: {
     url: "https://www.dgadr.gov.pt/pt/destaques",
     nome: "DGADR",
-    categoria: "agricultura",
+    categoria: "stake_agricultura",
     seletor: ".destaque-item a",
     tipo_conteudo: "destaque",
   },
   iniav: {
     url: "https://www.iniav.pt/divulgacao/noticias-iniav",
     nome: "INIAV",
-    categoria: "agricultura",
+    categoria: "stake_agricultura",
     seletor: ".news-title a",
     tipo_conteudo: "noticia",
   },
@@ -183,49 +178,49 @@ const STAKEHOLDERS_CONFIG = {
   iapmei: {
     url: "https://www.iapmei.pt/NOTICIAS.aspx",
     nome: "IAPMEI",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".noticia-link",
     tipo_conteudo: "noticia",
   },
   concorrencia: {
     url: "https://www.concorrencia.pt/pt/noticias-comunicados-e-intervencoes",
     nome: "AdC",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".views-row h3 a",
     tipo_conteudo: "comunicado",
   },
   aduaneiro: {
     url: "https://info-aduaneiro.portaldasfinancas.gov.pt/pt/noticias/Pages/noticias.aspx",
     nome: "AT Aduaneiro",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".ms-vb a",
     tipo_conteudo: "noticia",
   },
   bportugal: {
     url: "https://www.bportugal.pt/comunicados/media/banco-de-portugal",
     nome: "Banco de Portugal",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".comunicado-titulo a",
     tipo_conteudo: "comunicado",
   },
   portugalglobal: {
     url: "https://portugalglobal.pt/noticias/",
     nome: "Portugal Global",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".news-item h3 a",
     tipo_conteudo: "noticia",
   },
   consumidor: {
     url: "https://www.consumidor.gov.pt/comunicacao1/noticias1?page=1",
     nome: "Portal Consumidor",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".noticia-titulo a",
     tipo_conteudo: "noticia",
   },
   dgae: {
     url: "https://www.dgae.gov.pt/comunicacao/noticias.aspx",
     nome: "DGAE",
-    categoria: "economia_financas",
+    categoria: "stake_economia",
     seletor: ".news-title a",
     tipo_conteudo: "noticia",
   },
@@ -234,21 +229,21 @@ const STAKEHOLDERS_CONFIG = {
   infarmed: {
     url: "https://www.infarmed.pt/web/infarmed/noticias",
     nome: "INFARMED",
-    categoria: "saude",
+    categoria: "stake_saude",
     seletor: ".news-item h3 a",
     tipo_conteudo: "noticia",
   },
   ers: {
     url: "https://www.ers.pt/pt/comunicacao/noticias/",
     nome: "ERS",
-    categoria: "saude",
+    categoria: "stake_saude",
     seletor: ".noticia-titulo a",
     tipo_conteudo: "noticia",
   },
   igas: {
     url: "https://www.igas.min-saude.pt/category/noticias-e-eventos/noticias/",
     nome: "IGAS",
-    categoria: "saude",
+    categoria: "stake_saude",
     seletor: ".entry-title a",
     tipo_conteudo: "noticia",
   },
@@ -257,21 +252,21 @@ const STAKEHOLDERS_CONFIG = {
   cmvm: {
     url: "https://www.cmvm.pt/PInstitucional/Content?Input=E9639BDA21F5F3D13613E5F7C187F1A785B6EE9D48F21D9B121B7E5EC2D6A6F5",
     nome: "CMVM",
-    categoria: "imobiliario_habitacao",
+    categoria: "stake_imobiliario",
     seletor: ".comunicado a",
     tipo_conteudo: "comunicado",
   },
   dgterritorio: {
     url: "https://www.dgterritorio.gov.pt/todas-noticias",
     nome: "DGTerritório",
-    categoria: "imobiliario_habitacao",
+    categoria: "stake_imobiliario",
     seletor: ".news-title a",
     tipo_conteudo: "noticia",
   },
   ihru: {
     url: "https://www.ihru.pt/noticias",
     nome: "IHRU",
-    categoria: "imobiliario_habitacao",
+    categoria: "stake_imobiliario",
     seletor: ".noticia-item a",
     tipo_conteudo: "noticia",
   },
@@ -555,7 +550,7 @@ function parseData(dataString) {
       'dezembro': '12', 'dez': '12',
     };
 
-    // Formato: "22 outubro 2025" (UGT)
+    // Formato: "22 outubro 2025" ou "22 out 2025" (UGT, CGTP, CAP)
     const matchPT = texto.match(/(\d{1,2})\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s+(\d{4})/i);
     if (matchPT) {
       const dia = matchPT[1].padStart(2, '0');
@@ -564,7 +559,16 @@ function parseData(dataString) {
       return `${ano}-${mes}-${dia}`;
     }
 
-    // Tentar formatos comuns numéricos
+    // Formato: "24 de Outubro, 2025" (CCP com preposição "de")
+    const matchPTPrep = texto.match(/(\d{1,2})\s+de\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro),?\s+(\d{4})/i);
+    if (matchPTPrep) {
+      const dia = matchPTPrep[1].padStart(2, '0');
+      const mes = mesesPT[matchPTPrep[2].toLowerCase()];
+      const ano = matchPTPrep[3];
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    // Tentar formatos comuns numéricos (inclui CTP: "24/10/2025")
     const regexes = [
       /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/,  // 15/01/2025 ou 15-01-2025
       /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/,  // 2025-01-15
