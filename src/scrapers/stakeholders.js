@@ -1,6 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import Document from "../models/Document.js";
+const https = require("https");
 
 // ============================================
 // CONFIGURAÇÃO DOS STAKEHOLDERS
@@ -85,6 +86,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx",
     baseUrl: "https://portal.act.gov.pt",
     nome: "ACT",
+    timeout: 30000,  // ACT é lento
     categoria: "stake_laboral",
     // ✅ Seletores baseados em HTML real
     seletores: [
@@ -103,9 +105,9 @@ const STAKEHOLDERS_CONFIG = {
     categoria: "stake_laboral",
     // ✅ Seletores baseados em HTML real
     seletores: [
-      ".span9 a span",                    // ✅ Seletor correto confirmado (título no span)
+      ".span9 a",                    // ✅ Seletor correto confirmado (título no span)
       ".row-fluid .span9 a",              // Fallback 1
-      "a[title*='Conferência']",          // Fallback 2
+      "a[href*="/noticias"]",          // Fallback 2
     ],
     seletorData: ".span9 p",              // Data: "28-10-2025" (primeiro p)
     seletorResumo: ".span9 p:nth-of-type(2)", // Resumo (segundo p)
@@ -186,6 +188,8 @@ const STAKEHOLDERS_CONFIG = {
     ],
     seletorData: ".card-content",             // DGEG não tem data visível no HTML fornecido
     seletorResumo: ".card-content p",         // Resumo vazio no exemplo, mas preservar para futuro
+    timeout: 20000,
+    ignorarSSL: true,  // DGEG tem problema de certificado
     tipo_conteudo: "destaque",
   },
   adene: {
@@ -430,14 +434,20 @@ async function scrapeStakeholder(stakeholderId, config) {
 
   // Tentar 3 vezes antes de desistir
   for (let tentativa = 1; tentativa <= 3; tentativa++) {
-    try {
-      const response = await axios.get(config.url, {
+      const axiosConfig = {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
           Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
           "Accept-Language": "pt-PT,pt;q=0.9,en;q=0.8",
         },
-        timeout: 15000,
+        timeout: config.timeout || 15000,
+      };
+      
+      if (config.ignorarSSL) {
+        axiosConfig.httpsAgent = new https.Agent({ rejectUnauthorized: false });
+      }
+      
+      const response = await axios.get(config.url, axiosConfig);
       });
 
       const $ = cheerio.load(response.data);
