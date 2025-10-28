@@ -18,6 +18,9 @@ import {
   ChatBubbleLeftRightIcon,
   HandRaisedIcon,
   DocumentMagnifyingGlassIcon,
+  BriefcaseIcon,
+  BuildingOfficeIcon,
+  BeakerIcon,
 } from '@heroicons/react/24/solid';
 
 // 🎨 NOVAS CORES: #262261 (roxo) e #27aae2 (azul)
@@ -250,6 +253,84 @@ export const COMISSOES = {
     shadowCor: 'shadow-cyan-500/50',
     textCor: 'text-cyan-400',
     url: 'https://www.parlamento.pt/ActividadeParlamentar/Paginas/Sumulas-Conferencia-Lideres.aspx'
+  },
+  // CATEGORIAS DE STAKEHOLDERS
+  stake_concertacao: {
+    numero: '🤝',
+    nome: 'Concertação Social',
+    nomeCompleto: 'Concertação Social (CGTP, UGT, CAP, CCP, CTP)',
+    icon: UserGroupIcon,
+    cor: 'from-orange-400 to-red-500',
+    borderCor: 'border-orange-500',
+    bgCor: 'bg-orange-500/10',
+    shadowCor: 'shadow-orange-500/50',
+    textCor: 'text-orange-400'
+  },
+  stake_laboral: {
+    numero: '👷',
+    nome: 'Trabalho e Laboral',
+    nomeCompleto: 'Trabalho e Laboral (ACT, CITE, AIMA)',
+    icon: BriefcaseIcon,
+    cor: 'from-amber-400 to-orange-500',
+    borderCor: 'border-amber-500',
+    bgCor: 'bg-amber-500/10',
+    shadowCor: 'shadow-amber-500/50',
+    textCor: 'text-amber-400'
+  },
+  stake_ambiente: {
+    numero: '🌿',
+    nome: 'Ambiente',
+    nomeCompleto: 'Ambiente (APA, IGAMAOT, DGAV, DGEG, ADENE, ERSE)',
+    icon: BoltIcon,
+    cor: 'from-green-400 to-emerald-500',
+    borderCor: 'border-green-500',
+    bgCor: 'bg-green-500/10',
+    shadowCor: 'shadow-green-500/50',
+    textCor: 'text-green-400'
+  },
+  stake_agricultura: {
+    numero: '🌾',
+    nome: 'Agricultura',
+    nomeCompleto: 'Agricultura (DGADR, INIAV)',
+    icon: TruckIcon,
+    cor: 'from-lime-400 to-green-500',
+    borderCor: 'border-lime-500',
+    bgCor: 'bg-lime-500/10',
+    shadowCor: 'shadow-lime-500/50',
+    textCor: 'text-lime-400'
+  },
+  stake_economia: {
+    numero: '💼',
+    nome: 'Economia e Finanças',
+    nomeCompleto: 'Economia e Finanças (IAPMEI, AdC, AT, Banco de Portugal, etc.)',
+    icon: ChartBarIcon,
+    cor: 'from-yellow-400 to-amber-500',
+    borderCor: 'border-yellow-500',
+    bgCor: 'bg-yellow-500/10',
+    shadowCor: 'shadow-yellow-500/50',
+    textCor: 'text-yellow-400'
+  },
+  stake_saude: {
+    numero: '⚕️',
+    nome: 'Saúde',
+    nomeCompleto: 'Saúde (INFARMED, ERS, IGAS)',
+    icon: HeartIcon,
+    cor: 'from-red-400 to-rose-500',
+    borderCor: 'border-red-500',
+    bgCor: 'bg-red-500/10',
+    shadowCor: 'shadow-red-500/50',
+    textCor: 'text-red-400'
+  },
+  stake_imobiliario: {
+    numero: '🏠',
+    nome: 'Imobiliário e Habitação',
+    nomeCompleto: 'Imobiliário e Habitação (CMVM, DGTerritório, IHRU)',
+    icon: HomeModernIcon,
+    cor: 'from-stone-400 to-gray-500',
+    borderCor: 'border-stone-500',
+    bgCor: 'bg-stone-500/10',
+    shadowCor: 'shadow-stone-500/50',
+    textCor: 'text-stone-400'
   }
 };
 
@@ -264,6 +345,7 @@ export const TIPOS_CONTEUDO = {
   requerimento: { nome: 'Requerimento', emoji: '📝', cor: 'bg-indigo-500' },
   votacao: { nome: 'Votação', emoji: '🗳️', cor: 'bg-blue-500' },
   sumula: { nome: 'Súmula', emoji: '📋', cor: 'bg-cyan-500' },
+  noticia: { nome: 'Notícia', emoji: '📰', cor: 'bg-orange-500' },
   geral: { nome: 'Geral', emoji: '📄', cor: 'bg-slate-500' }
 };
 
@@ -290,7 +372,7 @@ export const formatDate = (date) => {
 };
 
 export const getFonteNome = (fonte) => {
-  return fonte === 'diario_republica' 
-    ? 'Diário da República' 
-    : 'Parlamento';
+  if (fonte === 'diario_republica') return 'Diário da República';
+  if (fonte === 'stakeholders') return 'Stakeholders';
+  return 'Parlamento';
 };
