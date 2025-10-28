@@ -12,17 +12,15 @@ const STAKEHOLDERS_CONFIG = {
     rss: "https://www.cgtp.pt/rss.xml", // Tentar RSS primeiro
     nome: "CGTP-IN",
     categoria: "stake_concertacao",
-    // Múltiplos seletores como fallback
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".entry-title a",
-      "article h2 a",
-      ".post-title a",
-      "h2 a[href*='/accao-e-luta/']",
-      ".content-item a",
-      "a[href*='/accao-e-luta/']"
+      ".page-header h2 a",              // ✅ Seletor correto confirmado
+      "h2[itemprop='headline'] a",      // Fallback 1
+      ".blog-item h2 a",                // Fallback 2
+      "h2 a[href*='/accao-e-luta/']",   // Fallback 3
     ],
-    seletorData: ".entry-date, .post-date, time, .published",
-    seletorResumo: ".entry-summary, .entry-content, .excerpt, p",
+    seletorData: ".article-info time, time[datetime]",
+    seletorResumo: ".item-content p, .article-intro",
     tipo_conteudo: "noticia",
   },
   ugt: {
@@ -46,15 +44,14 @@ const STAKEHOLDERS_CONFIG = {
     rss: "https://www.cap.pt/feed", // Tentar RSS
     nome: "CAP",
     categoria: "stake_concertacao",
+    // ✅ Seletores baseados em HTML real fornecido pelo utilizador
     seletores: [
-      ".noticia-titulo a",
-      "article h2 a",
-      ".news-title a",
-      "h3 a[href*='/noticias-']",
-      ".content-item a"
+      ".article-link",                  // ✅ Seletor correto confirmado
+      ".card-body.article-body a.article-link", // Fallback 1
+      "h3.article-title",               // Fallback 2 (pegar texto do h3)
     ],
-    seletorData: ".data, .date, time, .published",
-    seletorResumo: ".noticia-resumo, .excerpt, p",
+    seletorData: ".article-time",       // Data: "22 out 2025"
+    seletorResumo: ".article-excerpt",  // Resumo da notícia
     tipo_conteudo: "noticia",
   },
   ccp: {
