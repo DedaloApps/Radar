@@ -143,7 +143,7 @@ const STAKEHOLDERS_CONFIG = {
     ],
     seletorData: "time[datetime]",            // Data: "2025-10-28T10:40:12+00:00"
     seletorResumo: ".content",                // Resumo após o título
-    tipo_conteudo: "destaque",
+    tipo_conteudo: "noticia",
   },
   igamaot: {
     url: "https://www.igamaot.gov.pt/pt/espaco-publico/destaques#1",
@@ -158,7 +158,7 @@ const STAKEHOLDERS_CONFIG = {
     ],
     seletorData: ".tag a",                    // Data: "2025-10-28" (dentro de .tag)
     seletorResumo: ".title a",                // IGAMAOT não tem resumo, usar título
-    tipo_conteudo: "destaque",
+    tipo_conteudo: "noticia",
   },
   dgav: {
     url: "https://www.dgav.pt/destaques/noticias/",
@@ -182,15 +182,15 @@ const STAKEHOLDERS_CONFIG = {
     categoria: "stake_ambiente",
     // ✅ Seletores baseados em HTML real
     seletores: [
-      ".card-title h1",                       // ✅ Seletor correto confirmado
-      ".card .card-title h1",                 // Fallback 1
-      ".card-button a",                       // Fallback 2 (link "Ler mais")
+      ".card-button a",                       // ✅ Link "Ler mais" - CORRIGIDO
+      ".card .card-button a",                 // Fallback 1
+      "a.btn.btn-link",                       // Fallback 2
     ],
     seletorData: ".card-content",             // DGEG não tem data visível no HTML fornecido
     seletorResumo: ".card-content p",         // Resumo vazio no exemplo, mas preservar para futuro
     timeout: 20000,
     ignorarSSL: true,  // DGEG tem problema de certificado
-    tipo_conteudo: "destaque",
+    tipo_conteudo: "noticia",
   },
   adene: {
     url: "https://www.adene.pt/comunicacao/noticias/",
@@ -214,13 +214,13 @@ const STAKEHOLDERS_CONFIG = {
     categoria: "stake_ambiente",
     // ✅ Seletores baseados em HTML real
     seletores: [
-      ".card-body .card-title",               // ✅ Seletor correto confirmado (p.card-title)
-      ".card-body p.card-title",              // Fallback 1
-      ".card-body a .card-title",             // Fallback 2
+      ".card-body a",                         // ✅ Link correto - CORRIGIDO
+      ".card.listagem a",                     // Fallback 1
+      "a.without-underline",                  // Fallback 2
     ],
     seletorData: ".card-data",                // Data: "28/10/2025" (p.card-text.card-data)
     seletorResumo: ".card-title",             // ERSE não tem resumo, usar título
-    tipo_conteudo: "destaque",
+    tipo_conteudo: "noticia",
   },
 
   // AGRICULTURA
@@ -237,7 +237,7 @@ const STAKEHOLDERS_CONFIG = {
     ],
     seletorData: "meta[property='datePublished']", // Data: "2025-10-24T12:24:33+01:00"
     seletorResumo: "[property='text'] p",     // Resumo do artigo
-    tipo_conteudo: "destaque",
+    tipo_conteudo: "noticia",
   },
   iniav: {
     url: "https://www.iniav.pt/divulgacao/noticias-iniav",
@@ -325,29 +325,29 @@ const STAKEHOLDERS_CONFIG = {
     categoria: "stake_economia",
     // ✅ Seletores baseados em HTML real
     seletores: [
-      ".readingTextCard__content a",          // Link no card
-      ".readingTextCard a",                   // Fallback 1
-      ".btn--tertiary",                       // Fallback 2 (botão "Ver mais")
+      "a.readingTextCard",                    // ✅ Link principal - CORRIGIDO
+      ".readingTextCard.card",                // Fallback 1
+      ".readingTextCard__title",              // Fallback 2 (título dentro do link)
     ],
     seletorData: ".readingImageCard__infoItem", // Data: "31/10/2025"
     seletorResumo: ".readingTextCard__description", // Resumo da notícia
     tipo_conteudo: "noticia",
   },
-  consumidor: {
-    url: "https://www.consumidor.gov.pt/comunicacao1/noticias1?page=1",
-    baseUrl: "https://www.consumidor.gov.pt",
-    nome: "Portal Consumidor",
-    categoria: "stake_economia",
-    // ✅ Seletores baseados em HTML real
-    seletores: [
-      ".MainCard2__content a",                // Link no card
-      ".card-body a",                         // Fallback 1
-      "a[href*='/comunicacao1/noticias1/']",  // Fallback 2
-    ],
-    seletorData: ".MainCard2__contentDate",   // Data: "2025-10-28"
-    seletorResumo: ".MainCard2__contentText", // Resumo da notícia
-    tipo_conteudo: "noticia",
-  },
+  // ⚠️ DESATIVADO - Portal Consumidor não tem links individuais para notícias no HTML
+  // consumidor: {
+  //   url: "https://www.consumidor.gov.pt/comunicacao1/noticias1?page=1",
+  //   baseUrl: "https://www.consumidor.gov.pt",
+  //   nome: "Portal Consumidor",
+  //   categoria: "stake_economia",
+  //   seletores: [
+  //     ".MainCard2__content a",
+  //     ".card-body a",
+  //     "a[href*='/comunicacao1/noticias1/']",
+  //   ],
+  //   seletorData: ".MainCard2__contentDate",
+  //   seletorResumo: ".MainCard2__contentText",
+  //   tipo_conteudo: "noticia",
+  // },
   dgae: {
     url: "https://www.dgae.gov.pt/comunicacao/noticias.aspx",
     baseUrl: "https://www.dgae.gov.pt",
@@ -368,11 +368,25 @@ const STAKEHOLDERS_CONFIG = {
   // SAÚDE
   infarmed: {
     url: "https://www.infarmed.pt/web/infarmed/noticias",
+    baseUrl: "https://www.infarmed.pt",
     nome: "INFARMED",
     categoria: "stake_saude",
-    seletor: ".news-title a",
+    seletores: [
+      "a.event-link",
+      ".event a",
+      "article.event a",
+    ],
+    seletorData: ".event-header p",
+    seletorResumo: ".event-header h4",
     tipo_conteudo: "noticia",
   },
+
+
+
+
+
+
+
   ers: {
     url: "https://www.ers.pt/pt/comunicacao/noticias-1/",
     nome: "ERS",
@@ -386,7 +400,7 @@ const STAKEHOLDERS_CONFIG = {
     nome: "IGAS",
     categoria: "stake_saude",
     seletor: ".destaque-link",
-    tipo_conteudo: "destaque",
+    tipo_conteudo: "noticia",
   },
 
   // IMOBILIÁRIO/HABITAÇÃO
@@ -399,11 +413,39 @@ const STAKEHOLDERS_CONFIG = {
   },
   dgterritorio: {
     url: "https://www.dgterritorio.gov.pt/noticias",
+    baseUrl: "https://www.dgterritorio.gov.pt",
     nome: "DGTerritório",
     categoria: "stake_imobiliario",
-    seletor: ".news-item a",
+    seletores: [
+      ".post-title a",
+      ".post-block .post-title a",
+      "a[href*="/ciclo"]",
+    ],
+    seletorData: ".post-created",
+    seletorResumo: ".post-body",
     tipo_conteudo: "noticia",
   },
+  ihru: {
+    url: "https://www.ihru.pt/web/guest/noticias",
+    baseUrl: "https://www.ihru.pt",
+    nome: "IHRU",
+    categoria: "stake_imobiliario",
+    seletores: [
+      ".noticiasLink a",
+      ".noticiasItem a",
+      "a[title*="Saber mais"]",
+    ],
+    seletorData: ".noticiasDate",
+    seletorResumo: ".noticiasTitle",
+    tipo_conteudo: "noticia",
+  },
+
+
+
+
+
+
+
   ihru: {
     url: "https://www.ihru.pt/web/guest/noticias",
     nome: "IHRU",
