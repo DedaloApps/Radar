@@ -381,6 +381,58 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "noticia",
   },
 
+  // ============================================
+  // PARTIDOS
+  // ============================================
+  
+  // PSD - Site Oficial
+  psd_oficial: {
+    url: "https://www.psd.pt/pt/noticias",
+    baseUrl: "https://www.psd.pt",
+    nome: "PSD",
+    categoria: "stake_partidos",
+    seletores: [
+      "a.news__link",
+      ".news__row a",
+      "a[href*='/noticias/']",
+    ],
+    seletorTitulo: ".news__title",
+    seletorData: ".news__date",
+    seletorResumo: null,
+    tipo_conteudo: "noticia",
+  },
+
+  // PSD - Observador
+  psd_observador: {
+    url: "https://observador.pt/seccao/politica/psd/",
+    baseUrl: "https://observador.pt",
+    nome: "PSD",
+    categoria: "stake_partidos",
+    seletores: [
+      ".mod .title a",
+      "h1.title a",
+      ".image a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+  },
+
+  // PSD - CNN Portugal
+  psd_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/PSD",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "PSD",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+    ],
+    seletorTitulo: ".item-title",
+    seletorData: ".item-date",
+    seletorResumo: null,
+    tipo_conteudo: "noticia",
+  },
+
 
 
 
@@ -419,7 +471,7 @@ const STAKEHOLDERS_CONFIG = {
     seletores: [
       ".post-title a",
       ".post-block .post-title a",
-      "a[href*='/ciclo']",
+      "a[href*="/ciclo"]",
     ],
     seletorData: ".post-created",
     seletorResumo: ".post-body",
@@ -433,7 +485,7 @@ const STAKEHOLDERS_CONFIG = {
     seletores: [
       ".noticiasLink a",
       ".noticiasItem a",
-      "a[title*='Saber mais']",
+      "a[title*="Saber mais"]",
     ],
     seletorData: ".noticiasDate",
     seletorResumo: ".noticiasTitle",
