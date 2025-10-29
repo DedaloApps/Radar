@@ -471,7 +471,7 @@ const STAKEHOLDERS_CONFIG = {
     seletores: [
       ".post-title a",
       ".post-block .post-title a",
-      "a[href*="/ciclo"]",
+      "a[href*='/ciclo']",
     ],
     seletorData: ".post-created",
     seletorResumo: ".post-body",
@@ -485,7 +485,7 @@ const STAKEHOLDERS_CONFIG = {
     seletores: [
       ".noticiasLink a",
       ".noticiasItem a",
-      "a[title*="Saber mais"]",
+      "a[title*='Saber mais']",
     ],
     seletorData: ".noticiasDate",
     seletorResumo: ".noticiasTitle",
