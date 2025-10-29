@@ -81,21 +81,20 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "noticia",
   },
 
-  // ✅ LABORAL - CORRIGIDO
+  // ✅ LABORAL
   act: {
     url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx",
     baseUrl: "https://portal.act.gov.pt",
     nome: "ACT",
-    timeout: 30000,  // ACT é lento
+    timeout: 30000,
     categoria: "stake_laboral",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".dvNewsTitulo a",                  // ✅ Seletor correto confirmado
-      ".dvNew .dvNewsTitulo a",           // Fallback 1
-      ".col-md-12.dvNewsTitulo a",        // Fallback 2
+      ".dvNewsTitulo a",
+      ".dvNew .dvNewsTitulo a",
+      ".col-md-12.dvNewsTitulo a",
     ],
-    seletorData: ".dvNewsData",           // Data: "09/10/2025"
-    seletorResumo: ".dvNewsCorpo",        // Resumo da notícia
+    seletorData: ".dvNewsData",
+    seletorResumo: ".dvNewsCorpo",
     tipo_conteudo: "noticia",
   },
   cite: {
@@ -103,14 +102,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://cite.gov.pt",
     nome: "CITE",
     categoria: "stake_laboral",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".span9 a",                    // ✅ Seletor correto confirmado (título no span)
-      ".row-fluid .span9 a",              // Fallback 1
-      "a[href*='/noticias']",          // Fallback 2
+      ".span9 a",
+      ".row-fluid .span9 a",
+      "a[href*='/noticias']",
     ],
-    seletorData: ".span9 p",              // Data: "28-10-2025" (primeiro p)
-    seletorResumo: ".span9 p:nth-of-type(2)", // Resumo (segundo p)
+    seletorData: ".span9 p",
+    seletorResumo: ".span9 p:nth-of-type(2)",
     tipo_conteudo: "noticia",
   },
   aima: {
@@ -118,14 +116,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://aima.gov.pt",
     nome: "AIMA",
     categoria: "stake_laboral",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".uk-h4 a",                         // ✅ Seletor correto confirmado
-      "h3.uk-h4 a.uk-link-reset",         // Fallback 1
-      ".uk-card h3 a",                    // Fallback 2
+      ".uk-h4 a",
+      "h3.uk-h4 a.uk-link-reset",
+      ".uk-card h3 a",
     ],
-    seletorData: ".uk-text-meta",         // Data: "24.10.2025"
-    seletorResumo: ".uk-h4 a",            // AIMA não tem resumo, usar título
+    seletorData: ".uk-text-meta",
+    seletorResumo: ".uk-h4 a",
     tipo_conteudo: "noticia",
   },
 
@@ -135,14 +132,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://apambiente.pt",
     nome: "APA",
     categoria: "stake_ambiente",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      "h2.is-size-5 a",                       // ✅ Seletor correto confirmado
-      ".content h2 a",                        // Fallback 1
-      "article h2 a",                         // Fallback 2
+      "h2.is-size-5 a",
+      ".content h2 a",
+      "article h2 a",
     ],
-    seletorData: "time[datetime]",            // Data: "2025-10-28T10:40:12+00:00"
-    seletorResumo: ".content",                // Resumo após o título
+    seletorData: "time[datetime]",
+    seletorResumo: ".content",
     tipo_conteudo: "noticia",
   },
   igamaot: {
@@ -150,14 +146,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.igamaot.gov.pt",
     nome: "IGAMAOT",
     categoria: "stake_ambiente",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".info .title a",                       // ✅ Seletor correto confirmado
-      ".title a[href*='/destaques/']",        // Fallback 1
-      "div.title a",                          // Fallback 2
+      ".info .title a",
+      ".title a[href*='/destaques/']",
+      "div.title a",
     ],
-    seletorData: ".tag a",                    // Data: "2025-10-28" (dentro de .tag)
-    seletorResumo: ".title a",                // IGAMAOT não tem resumo, usar título
+    seletorData: ".tag a",
+    seletorResumo: ".title a",
     tipo_conteudo: "noticia",
   },
   dgav: {
@@ -165,14 +160,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.dgav.pt",
     nome: "DGAV",
     categoria: "stake_ambiente",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      "h5 a.red",                             // ✅ Seletor correto confirmado
-      "h5 a[rel='bookmark']",                 // Fallback 1
-      ".pb-3 h5 a",                           // Fallback 2
+      "h5 a.red",
+      "h5 a[rel='bookmark']",
+      ".pb-3 h5 a",
     ],
-    seletorData: ".green",                    // Data: "28/10/2025" (span com class green)
-    seletorResumo: "h5 a",                    // DGAV não tem resumo, usar título
+    seletorData: ".green",
+    seletorResumo: "h5 a",
     tipo_conteudo: "noticia",
   },
   dgeg: {
@@ -180,16 +174,15 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.dgeg.gov.pt",
     nome: "DGEG",
     categoria: "stake_ambiente",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".card-button a",                       // ✅ Link "Ler mais" - CORRIGIDO
-      ".card .card-button a",                 // Fallback 1
-      "a.btn.btn-link",                       // Fallback 2
+      ".card-button a",
+      ".card .card-button a",
+      "a.btn.btn-link",
     ],
-    seletorData: ".card-content",             // DGEG não tem data visível no HTML fornecido
-    seletorResumo: ".card-content p",         // Resumo vazio no exemplo, mas preservar para futuro
+    seletorData: ".card-content",
+    seletorResumo: ".card-content p",
     timeout: 20000,
-    ignorarSSL: true,  // DGEG tem problema de certificado
+    ignorarSSL: true,
     tipo_conteudo: "noticia",
   },
   adene: {
@@ -197,14 +190,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.adene.pt",
     nome: "ADENE",
     categoria: "stake_ambiente",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      "h4.pt-cv-title a",                     // ✅ Seletor correto confirmado
-      ".pt-cv-content-item h4 a",             // Fallback 1
-      "a[href*='/adene-lanca']",              // Fallback 2
+      "h4.pt-cv-title a",
+      ".pt-cv-content-item h4 a",
+      "a[href*='/adene-lanca']",
     ],
-    seletorData: ".entry-date time",          // Data: "Outubro 27, 2025" (time[datetime])
-    seletorResumo: "h4.pt-cv-title a",        // ADENE não tem resumo, usar título
+    seletorData: ".entry-date time",
+    seletorResumo: "h4.pt-cv-title a",
     tipo_conteudo: "noticia",
   },
   erse: {
@@ -212,14 +204,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.erse.pt",
     nome: "ERSE",
     categoria: "stake_ambiente",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".card-body a",                         // ✅ Link correto - CORRIGIDO
-      ".card.listagem a",                     // Fallback 1
-      "a.without-underline",                  // Fallback 2
+      ".card-body a",
+      ".card.listagem a",
+      "a.without-underline",
     ],
-    seletorData: ".card-data",                // Data: "28/10/2025" (p.card-text.card-data)
-    seletorResumo: ".card-title",             // ERSE não tem resumo, usar título
+    seletorData: ".card-data",
+    seletorResumo: ".card-title",
     tipo_conteudo: "noticia",
   },
 
@@ -229,14 +220,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.dgadr.gov.pt",
     nome: "DGADR",
     categoria: "stake_agricultura",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".page-header h2 a",                    // ✅ Seletor correto confirmado
-      "h2[itemprop='name'] a",                // Fallback 1
-      ".jl-article h2 a",                     // Fallback 2
+      ".page-header h2 a",
+      "h2[itemprop='name'] a",
+      ".jl-article h2 a",
     ],
-    seletorData: "meta[property='datePublished']", // Data: "2025-10-24T12:24:33+01:00"
-    seletorResumo: "[property='text'] p",     // Resumo do artigo
+    seletorData: "meta[property='datePublished']",
+    seletorResumo: "[property='text'] p",
     tipo_conteudo: "noticia",
   },
   iniav: {
@@ -244,18 +234,15 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.iniav.pt",
     nome: "INIAV",
     categoria: "stake_agricultura",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".article-header h2 a",                 // ✅ Seletor correto confirmado
-      ".article h2 a",                        // Fallback 1
-      "[itemprop='blogPost'] h2 a",           // Fallback 2
+      ".article-header h2 a",
+      ".article h2 a",
+      "[itemprop='blogPost'] h2 a",
     ],
-    seletorData: "time[datetime]",            // Data: "2025-10-23T10:04:43+01:00"
-    seletorResumo: ".article-introtext p",    // Resumo da notícia
+    seletorData: "time[datetime]",
+    seletorResumo: ".article-introtext p",
     tipo_conteudo: "noticia",
   },
-
-
 
   // ECONOMIA/FINANÇAS
   iapmei: {
@@ -263,14 +250,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.iapmei.pt",
     nome: "IAPMEI",
     categoria: "stake_economia",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".contain h1 a",                        // ✅ Seletor correto confirmado
-      ".col-lg-3 h1 a",                       // Fallback 1
-      ".contain a[href*='/NOTICIAS/']",       // Fallback 2
+      ".contain h1 a",
+      ".col-lg-3 h1 a",
+      ".contain a[href*='/NOTICIAS/']",
     ],
-    seletorData: ".data",                     // Data: "27-10-2025"
-    seletorResumo: ".contain p",              // Resumo da notícia
+    seletorData: ".data",
+    seletorResumo: ".contain p",
     tipo_conteudo: "noticia",
   },
   concorrencia: {
@@ -278,14 +264,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.concorrencia.pt",
     nome: "AdC",
     categoria: "stake_economia",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".text-wrapper a",                      // Link wrapper (assumindo que existe)
-      ".title a",                             // Fallback 1  
-      "a[href*='/noticias-comunicados']",     // Fallback 2
+      ".text-wrapper a",
+      ".title a",
+      "a[href*='/noticias-comunicados']",
     ],
-    seletorData: ".text-wrapper .date",       // Data: "23-10-2025"
-    seletorResumo: ".title",                  // AdC não tem resumo separado, usar título
+    seletorData: ".text-wrapper .date",
+    seletorResumo: ".title",
     tipo_conteudo: "comunicado",
   },
   aduaneiro: {
@@ -293,14 +278,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://info-aduaneiro.portaldasfinancas.gov.pt",
     nome: "AT Aduaneiro",
     categoria: "stake_economia",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".col-sm-9 a.more-btn",                 // ✅ Link "Ver mais"
-      "a.more-btn",                           // Fallback 1
-      ".col-sm-9 a",                          // Fallback 2
+      ".col-sm-9 a.more-btn",
+      "a.more-btn",
+      ".col-sm-9 a",
     ],
-    seletorData: ".col-sm-9",                 // AT Aduaneiro não tem data visível
-    seletorResumo: ".col-sm-9 p",             // Resumo da notícia
+    seletorData: ".col-sm-9",
+    seletorResumo: ".col-sm-9 p",
     tipo_conteudo: "noticia",
   },
   bportugal: {
@@ -308,14 +292,13 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://www.bportugal.pt",
     nome: "Banco de Portugal",
     categoria: "stake_economia",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".content-container--slide-title--span", // ✅ Seletor correto confirmado
-      ".bdpsi-h6 .content-container--slide-title--span", // Fallback 1
-      ".content-container--link-container",   // Fallback 2
+      ".content-container--slide-title--span",
+      ".bdpsi-h6 .content-container--slide-title--span",
+      ".content-container--link-container",
     ],
-    seletorData: ".content-container--slide-date", // Data: "27-10-2025"
-    seletorResumo: ".content-container--slide-title--span", // Banco Portugal não tem resumo, usar título
+    seletorData: ".content-container--slide-date",
+    seletorResumo: ".content-container--slide-title--span",
     tipo_conteudo: "comunicado",
   },
   portugalglobal: {
@@ -323,47 +306,29 @@ const STAKEHOLDERS_CONFIG = {
     baseUrl: "https://portugalglobal.pt",
     nome: "Portugal Global",
     categoria: "stake_economia",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      "a.readingTextCard",                    // ✅ Link principal - CORRIGIDO
-      ".readingTextCard.card",                // Fallback 1
-      ".readingTextCard__title",              // Fallback 2 (título dentro do link)
+      "a.readingTextCard",
+      ".readingTextCard.card",
+      ".readingTextCard__title",
     ],
-    seletorData: ".readingImageCard__infoItem", // Data: "31/10/2025"
-    seletorResumo: ".readingTextCard__description", // Resumo da notícia
+    seletorData: ".readingImageCard__infoItem",
+    seletorResumo: ".readingTextCard__description",
     tipo_conteudo: "noticia",
   },
-  // ⚠️ DESATIVADO - Portal Consumidor não tem links individuais para notícias no HTML
-  // consumidor: {
-  //   url: "https://www.consumidor.gov.pt/comunicacao1/noticias1?page=1",
-  //   baseUrl: "https://www.consumidor.gov.pt",
-  //   nome: "Portal Consumidor",
-  //   categoria: "stake_economia",
-  //   seletores: [
-  //     ".MainCard2__content a",
-  //     ".card-body a",
-  //     "a[href*='/comunicacao1/noticias1/']",
-  //   ],
-  //   seletorData: ".MainCard2__contentDate",
-  //   seletorResumo: ".MainCard2__contentText",
-  //   tipo_conteudo: "noticia",
-  // },
   dgae: {
     url: "https://www.dgae.gov.pt/comunicacao/noticias.aspx",
     baseUrl: "https://www.dgae.gov.pt",
     nome: "DGAE",
     categoria: "stake_economia",
-    // ✅ Seletores baseados em HTML real
     seletores: [
-      ".register-title a",                    // ✅ Seletor correto confirmado
-      ".register .register-title a",          // Fallback 1
-      "a[href*='comunicacao/noticias/']",     // Fallback 2
+      ".register-title a",
+      ".register .register-title a",
+      "a[href*='comunicacao/noticias/']",
     ],
-    seletorData: ".register-date",            // Data: "2025-10-28"
-    seletorResumo: ".register-text",          // Resumo da notícia
+    seletorData: ".register-date",
+    seletorResumo: ".register-text",
     tipo_conteudo: "noticia",
   },
-
 
   // SAÚDE
   infarmed: {
@@ -380,70 +345,11 @@ const STAKEHOLDERS_CONFIG = {
     seletorResumo: ".event-header h4",
     tipo_conteudo: "noticia",
   },
-
-  // ============================================
-  // PARTIDOS
-  // ============================================
-  
-  // PSD - Site Oficial
-  psd_oficial: {
-    url: "https://www.psd.pt/pt/noticias",
-    baseUrl: "https://www.psd.pt",
-    nome: "PSD",
-    categoria: "stake_partidos",
-    seletores: [
-      "a.news__link",
-      ".news__row a",
-      "a[href*='/noticias/']",
-    ],
-    seletorTitulo: ".news__title",
-    seletorData: ".news__date",
-    seletorResumo: null,
-    tipo_conteudo: "noticia",
-  },
-
-  // PSD - Observador
-  psd_observador: {
-    url: "https://observador.pt/seccao/politica/psd/",
-    baseUrl: "https://observador.pt",
-    nome: "PSD",
-    categoria: "stake_partidos",
-    seletores: [
-      ".mod .title a",
-      "h1.title a",
-      ".image a",
-    ],
-    seletorData: "time.timeago",
-    seletorResumo: ".lead",
-    tipo_conteudo: "noticia",
-  },
-
-  // PSD - CNN Portugal
-  psd_cnn: {
-    url: "https://cnnportugal.iol.pt/noticias/PSD",
-    baseUrl: "https://cnnportugal.iol.pt",
-    nome: "PSD",
-    categoria: "stake_partidos",
-    seletores: [
-      ".item a",
-    ],
-    seletorTitulo: ".item-title",
-    seletorData: ".item-date",
-    seletorResumo: null,
-    tipo_conteudo: "noticia",
-  },
-
-
-
-
-
-
-
   ers: {
     url: "https://www.ers.pt/pt/comunicacao/noticias-1/",
     nome: "ERS",
     categoria: "stake_saude",
-    ignorarSSL: true,  // ERS tem problema de certificado
+    ignorarSSL: true,
     seletor: ".noticia-titulo a",
     tipo_conteudo: "noticia",
   },
@@ -492,17 +398,58 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "noticia",
   },
 
+  // ============================================
+  // ✅ PARTIDOS - COM CAMPO fonte_original
+  // ============================================
+  
+  // PSD - Site Oficial
+  psd_oficial: {
+    url: "https://www.psd.pt/pt/noticias",
+    baseUrl: "https://www.psd.pt",
+    nome: "PSD",
+    fonte_original: "Site Oficial",  // ✅ NOVO CAMPO
+    categoria: "stake_partidos",
+    seletores: [
+      "a.news__link",
+      ".news__row a",
+      "a[href*='/noticias/']",
+    ],
+    seletorTitulo: ".news__title",
+    seletorData: ".news__date",
+    seletorResumo: null,
+    tipo_conteudo: "noticia",
+  },
 
+  // PSD - Observador
+  psd_observador: {
+    url: "https://observador.pt/seccao/politica/psd/",
+    baseUrl: "https://observador.pt",
+    nome: "PSD",
+    fonte_original: "Observador",  // ✅ NOVO CAMPO
+    categoria: "stake_partidos",
+    seletores: [
+      ".mod .title a",
+      "h1.title a",
+      ".image a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+  },
 
-
-
-
-
-  ihru: {
-    url: "https://www.ihru.pt/web/guest/noticias",
-    nome: "IHRU",
-    categoria: "stake_imobiliario",
-    seletor: ".portlet-title a",
+  // PSD - CNN Portugal
+  psd_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/PSD",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "PSD",
+    fonte_original: "CNN Portugal",  // ✅ NOVO CAMPO
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+    ],
+    seletorTitulo: ".item-title",
+    seletorData: ".item-date",
+    seletorResumo: null,
     tipo_conteudo: "noticia",
   },
 };
@@ -591,7 +538,8 @@ async function scrapeStakeholder(stakeholderId, config) {
                 }
               }
 
-              documentos.push({
+              // ✅ NOVO: Construir documento com fonte_original para partidos
+              const documento = {
                 tipo_conteudo: config.tipo_conteudo,
                 tipo_radar: "stakeholders",
                 categoria: config.categoria,
@@ -599,9 +547,16 @@ async function scrapeStakeholder(stakeholderId, config) {
                 data_publicacao: data,
                 url: urlCompleta,
                 fonte: "stakeholders",
-                entidades: config.nome,
+                entidades: config.nome,  // Nome do partido (ex: "PSD")
                 resumo: resumo,
-              });
+              };
+
+              // ✅ Se for partido, adicionar fonte_original
+              if (config.categoria === "stake_partidos" && config.fonte_original) {
+                documento.fonte_original = config.fonte_original;
+              }
+
+              documentos.push(documento);
             }
           });
 
