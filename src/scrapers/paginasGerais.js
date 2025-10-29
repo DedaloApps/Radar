@@ -385,7 +385,7 @@ async function scrapeSumulasConferencia() {
   }
 }
 
-// 5. ALTERAÇÕES OE (Orçamento de Estado)
+// 5. ALTERAÇÕES OE (Orçamento de Estado) - ADAPTADO PARA USAR CAMPOS EXISTENTES
 async function scrapeAlteracoesOE() {
   console.log("\n🔍 Scraping Alterações OE...");
   
@@ -459,6 +459,20 @@ async function scrapeAlteracoesOE() {
         
         const titulo = `Proposta de Alteração ${numero} - ${proponentes} [${estado}]`;
         
+        // USANDO CAMPOS EXISTENTES:
+        // - autores = proponentes
+        // - entidades = apresentada
+        // - resumo = incluir incide e tipo
+        // - conteudo = URL do PDF
+        
+        const resumoCompleto = [
+          `Alteração OE ${numero} apresentada por ${proponentes}`,
+          estado ? `Estado: ${estado}` : null,
+          incide ? `Incide: ${incide}` : null,
+          tipo ? `Tipo: ${tipo}` : null,
+          documentoUrl ? `PDF: ${limparUrl(documentoUrl)}` : null
+        ].filter(Boolean).join(' | ');
+        
         console.log(`  ✅ DEBUG Row ${index}: Adicionando alteração OE`);
         
         alteracoes.push({
@@ -467,14 +481,12 @@ async function scrapeAlteracoesOE() {
           titulo: titulo,
           numero: numero || null,
           data_publicacao: dataCompleta,
-          proponentes: proponentes || null,
+          autores: proponentes || null,           // ← USANDO autores para proponentes
+          entidades: apresentada || null,         // ← USANDO entidades para apresentada
           estado: estado || null,
-          apresentada: apresentada || null,
-          incide: incide || null,
-          tipo: tipo || null,
-          resumo: `Alteração OE ${numero} apresentada por ${proponentes} - Estado: ${estado}`,
+          resumo: resumoCompleto,                 // ← USANDO resumo para tudo
+          conteudo: documentoUrl ? limparUrl(documentoUrl) : null, // ← PDF no conteudo
           url: limparUrl(detalhesUrl),
-          documento_pdf: documentoUrl ? limparUrl(documentoUrl) : null,
           fonte: "parlamento",
         });
       } else {
