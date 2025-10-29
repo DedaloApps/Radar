@@ -385,117 +385,170 @@ async function scrapeSumulasConferencia() {
   }
 }
 
-// 5. ALTERAÇÕES OE (Orçamento de Estado) - ADAPTADO PARA USAR CAMPOS EXISTENTES
+// 5. ALTERAÇÕES OE (Orçamento de Estado) - COM PAGINAÇÃO (3 PÁGINAS)
 async function scrapeAlteracoesOE() {
   console.log("\n🔍 Scraping Alterações OE...");
   
   try {
-    const response = await axios.get(
-      "https://www.parlamento.pt/OrcamentoEstado/Paginas/PesquisaPropAlteracao37XVII.aspx",
+    const url = "https://www.parlamento.pt/OrcamentoEstado/Paginas/PesquisaPropAlteracao37XVII.aspx";
+    const alteracoesTotal = [];
+    
+    // Função auxiliar para extrair alterações de uma página
+    function extrairAlteracoesDaPagina($) {
+      const alteracoes = [];
+      const rows = $(".row.margin_h0.margin-Top-15");
+      
+      rows.each((index, element) => {
+        const $row = $(element);
+        const colunas = $row.find('.col-xs-12');
+        
+        if (colunas.length < 4) {
+          return; // Skip - não é uma proposta válida
+        }
+        
+        let numero = "";
+        let data = "";
+        let documentoUrl = "";
+        let apresentada = "";
+        let incide = "";
+        let tipo = "";
+        let proponentes = "";
+        let estado = "";
+        let detalhesUrl = "";
+        
+        colunas.each((i, col) => {
+          const $col = $(col);
+          const label = $col.find('.TextoRegular-Titulo').text().trim();
+          
+          if (label === "Documento") {
+            const docLink = $col.find('a[id*="hplDocumento"]');
+            documentoUrl = docLink.attr("href");
+          } else if (label === "Número") {
+            const numLink = $col.find('a[id*="hplNumero"]');
+            numero = numLink.text().trim();
+            detalhesUrl = numLink.attr("href");
+          } else if (label === "Data") {
+            data = $col.find('span[id*="lblData"]').text().trim();
+          } else if (label === "Apresentada") {
+            apresentada = $col.find('.TextoRegular').text().trim();
+          } else if (label === "Incide") {
+            incide = $col.find('.TextoRegular').text().trim();
+          } else if (label === "Tipo") {
+            tipo = $col.find('.TextoRegular').text().trim();
+          } else if (label === "Proponentes") {
+            proponentes = $col.find('.TextoRegular').text().trim();
+          } else if (label === "Estado") {
+            estado = $col.find('.TextoRegular').text().trim();
+          }
+        });
+        
+        if (numero && detalhesUrl) {
+          const dataCompleta = normalizarData(data);
+          const titulo = `Proposta de Alteração ${numero} - ${proponentes} [${estado}]`;
+          
+          const resumoCompleto = [
+            `Alteração OE ${numero} apresentada por ${proponentes}`,
+            estado ? `Estado: ${estado}` : null,
+            incide ? `Incide: ${incide}` : null,
+            tipo ? `Tipo: ${tipo}` : null,
+            documentoUrl ? `PDF: ${limparUrl(documentoUrl)}` : null
+          ].filter(Boolean).join(' | ');
+          
+          alteracoes.push({
+            tipo_conteudo: "alteracao_oe",
+            categoria: "geral_alteracoes_oe",
+            titulo: titulo,
+            numero: numero || null,
+            data_publicacao: dataCompleta,
+            autores: proponentes || null,
+            entidades: apresentada || null,
+            estado: estado || null,
+            resumo: resumoCompleto,
+            conteudo: documentoUrl ? limparUrl(documentoUrl) : null,
+            url: limparUrl(detalhesUrl),
+            fonte: "parlamento",
+          });
+        }
+      });
+      
+      return alteracoes;
+    }
+    
+    // PÁGINA 1 - GET inicial
+    console.log(`  🔍 Página 1...`);
+    const response1 = await axios.get(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+      timeout: 15000,
+    });
+    
+    const $page1 = cheerio.load(response1.data);
+    const alteracoesPagina1 = extrairAlteracoesDaPagina($page1);
+    alteracoesTotal.push(...alteracoesPagina1);
+    console.log(`  ✅ Página 1: ${alteracoesPagina1.length} alterações`);
+    
+    // Extrair VIEWSTATE e EVENTVALIDATION para fazer POST nas próximas páginas
+    const viewState = $page1('input[name="__VIEWSTATE"]').val();
+    const viewStateGenerator = $page1('input[name="__VIEWSTATEGENERATOR"]').val();
+    const eventValidation = $page1('input[name="__EVENTVALIDATION"]').val();
+    
+    // PÁGINA 2 - POST
+    console.log(`  🔍 Página 2...`);
+    const response2 = await axios.post(url, 
+      new URLSearchParams({
+        '__EVENTTARGET': 'ctl00$ctl51$g_f52058bb_01fc_4290_a994_84e26d343f91$ctl00$dpgResults$ctl00$ctl01',
+        '__EVENTARGUMENT': '',
+        '__VIEWSTATE': viewState,
+        '__VIEWSTATEGENERATOR': viewStateGenerator,
+        '__EVENTVALIDATION': eventValidation
+      }).toString(),
       {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
         timeout: 15000,
       }
     );
-
-    const $ = cheerio.load(response.data);
-    const alteracoes = [];
-
-    console.log(`  🔍 DEBUG: Procurando elementos com .row.margin_h0.margin-Top-15`);
-    const rows = $(".row.margin_h0.margin-Top-15");
-    console.log(`  📊 DEBUG: Encontrados ${rows.length} elementos`);
-
-    rows.each((index, element) => {
-      const $row = $(element);
-      
-      // Verificar se tem colunas (para filtrar o header)
-      const colunas = $row.find('.col-xs-12');
-      if (colunas.length < 4) {
-        return; // Skip - não é uma proposta válida
+    
+    const $page2 = cheerio.load(response2.data);
+    const alteracoesPagina2 = extrairAlteracoesDaPagina($page2);
+    alteracoesTotal.push(...alteracoesPagina2);
+    console.log(`  ✅ Página 2: ${alteracoesPagina2.length} alterações`);
+    
+    // Atualizar VIEWSTATE para página 3
+    const viewState2 = $page2('input[name="__VIEWSTATE"]').val();
+    const viewStateGenerator2 = $page2('input[name="__VIEWSTATEGENERATOR"]').val();
+    const eventValidation2 = $page2('input[name="__EVENTVALIDATION"]').val();
+    
+    // PÁGINA 3 - POST
+    console.log(`  🔍 Página 3...`);
+    const response3 = await axios.post(url, 
+      new URLSearchParams({
+        '__EVENTTARGET': 'ctl00$ctl51$g_f52058bb_01fc_4290_a994_84e26d343f91$ctl00$dpgResults$ctl00$ctl02',
+        '__EVENTARGUMENT': '',
+        '__VIEWSTATE': viewState2,
+        '__VIEWSTATEGENERATOR': viewStateGenerator2,
+        '__EVENTVALIDATION': eventValidation2
+      }).toString(),
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        timeout: 15000,
       }
-      
-      let numero = "";
-      let data = "";
-      let documentoUrl = "";
-      let apresentada = "";
-      let incide = "";
-      let tipo = "";
-      let proponentes = "";
-      let estado = "";
-      let detalhesUrl = "";
-      
-      colunas.each((i, col) => {
-        const $col = $(col);
-        const label = $col.find('.TextoRegular-Titulo').text().trim();
-        
-        if (label === "Documento") {
-          const docLink = $col.find('a[id*="hplDocumento"]');
-          documentoUrl = docLink.attr("href");
-        } else if (label === "Número") {
-          const numLink = $col.find('a[id*="hplNumero"]');
-          numero = numLink.text().trim();
-          detalhesUrl = numLink.attr("href");
-        } else if (label === "Data") {
-          data = $col.find('span[id*="lblData"]').text().trim();
-        } else if (label === "Apresentada") {
-          apresentada = $col.find('.TextoRegular').text().trim();
-        } else if (label === "Incide") {
-          incide = $col.find('.TextoRegular').text().trim();
-        } else if (label === "Tipo") {
-          tipo = $col.find('.TextoRegular').text().trim();
-        } else if (label === "Proponentes") {
-          proponentes = $col.find('.TextoRegular').text().trim();
-        } else if (label === "Estado") {
-          estado = $col.find('.TextoRegular').text().trim();
-        }
-      });
-      
-      console.log(`  🔍 DEBUG Row ${index}: numero="${numero}", data="${data}", proponentes="${proponentes}"`);
-      
-      if (numero && detalhesUrl) {
-        const dataCompleta = normalizarData(data);
-        
-        const titulo = `Proposta de Alteração ${numero} - ${proponentes} [${estado}]`;
-        
-        // USANDO CAMPOS EXISTENTES:
-        // - autores = proponentes
-        // - entidades = apresentada
-        // - resumo = incluir incide e tipo
-        // - conteudo = URL do PDF
-        
-        const resumoCompleto = [
-          `Alteração OE ${numero} apresentada por ${proponentes}`,
-          estado ? `Estado: ${estado}` : null,
-          incide ? `Incide: ${incide}` : null,
-          tipo ? `Tipo: ${tipo}` : null,
-          documentoUrl ? `PDF: ${limparUrl(documentoUrl)}` : null
-        ].filter(Boolean).join(' | ');
-        
-        console.log(`  ✅ DEBUG Row ${index}: Adicionando alteração OE`);
-        
-        alteracoes.push({
-          tipo_conteudo: "alteracao_oe",
-          categoria: "geral_alteracoes_oe",
-          titulo: titulo,
-          numero: numero || null,
-          data_publicacao: dataCompleta,
-          autores: proponentes || null,           // ← USANDO autores para proponentes
-          entidades: apresentada || null,         // ← USANDO entidades para apresentada
-          estado: estado || null,
-          resumo: resumoCompleto,                 // ← USANDO resumo para tudo
-          conteudo: documentoUrl ? limparUrl(documentoUrl) : null, // ← PDF no conteudo
-          url: limparUrl(detalhesUrl),
-          fonte: "parlamento",
-        });
-      } else {
-        console.log(`  ❌ DEBUG Row ${index}: Falta número ou URL de detalhes`);
-      }
-    });
-
-    console.log(`  📊 Encontradas: ${alteracoes.length} alterações OE`);
-    return alteracoes;
+    );
+    
+    const $page3 = cheerio.load(response3.data);
+    const alteracoesPagina3 = extrairAlteracoesDaPagina($page3);
+    alteracoesTotal.push(...alteracoesPagina3);
+    console.log(`  ✅ Página 3: ${alteracoesPagina3.length} alterações`);
+    
+    console.log(`  📊 Total encontradas: ${alteracoesTotal.length} alterações OE (${alteracoesPagina1.length} + ${alteracoesPagina2.length} + ${alteracoesPagina3.length})`);
+    return alteracoesTotal;
+    
   } catch (error) {
     console.error(`  ❌ Erro ao scraping Alterações OE:`, error.message);
     return [];
