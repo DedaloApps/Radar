@@ -385,16 +385,122 @@ async function scrapeSumulasConferencia() {
   }
 }
 
+// 5. ALTERAÇÕES OE (Orçamento de Estado)
+async function scrapeAlteracoesOE() {
+  console.log("\n🔍 Scraping Alterações OE...");
+  
+  try {
+    const response = await axios.get(
+      "https://www.parlamento.pt/OrcamentoEstado/Paginas/PesquisaPropAlteracao37XVII.aspx",
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        },
+        timeout: 15000,
+      }
+    );
+
+    const $ = cheerio.load(response.data);
+    const alteracoes = [];
+
+    console.log(`  🔍 DEBUG: Procurando elementos com .row.margin_h0.margin-Top-15`);
+    const rows = $(".row.margin_h0.margin-Top-15");
+    console.log(`  📊 DEBUG: Encontrados ${rows.length} elementos`);
+
+    rows.each((index, element) => {
+      const $row = $(element);
+      
+      // Verificar se tem colunas (para filtrar o header)
+      const colunas = $row.find('.col-xs-12');
+      if (colunas.length < 4) {
+        return; // Skip - não é uma proposta válida
+      }
+      
+      let numero = "";
+      let data = "";
+      let documentoUrl = "";
+      let apresentada = "";
+      let incide = "";
+      let tipo = "";
+      let proponentes = "";
+      let estado = "";
+      let detalhesUrl = "";
+      
+      colunas.each((i, col) => {
+        const $col = $(col);
+        const label = $col.find('.TextoRegular-Titulo').text().trim();
+        
+        if (label === "Documento") {
+          const docLink = $col.find('a[id*="hplDocumento"]');
+          documentoUrl = docLink.attr("href");
+        } else if (label === "Número") {
+          const numLink = $col.find('a[id*="hplNumero"]');
+          numero = numLink.text().trim();
+          detalhesUrl = numLink.attr("href");
+        } else if (label === "Data") {
+          data = $col.find('span[id*="lblData"]').text().trim();
+        } else if (label === "Apresentada") {
+          apresentada = $col.find('.TextoRegular').text().trim();
+        } else if (label === "Incide") {
+          incide = $col.find('.TextoRegular').text().trim();
+        } else if (label === "Tipo") {
+          tipo = $col.find('.TextoRegular').text().trim();
+        } else if (label === "Proponentes") {
+          proponentes = $col.find('.TextoRegular').text().trim();
+        } else if (label === "Estado") {
+          estado = $col.find('.TextoRegular').text().trim();
+        }
+      });
+      
+      console.log(`  🔍 DEBUG Row ${index}: numero="${numero}", data="${data}", proponentes="${proponentes}"`);
+      
+      if (numero && detalhesUrl) {
+        const dataCompleta = normalizarData(data);
+        
+        const titulo = `Proposta de Alteração ${numero} - ${proponentes} [${estado}]`;
+        
+        console.log(`  ✅ DEBUG Row ${index}: Adicionando alteração OE`);
+        
+        alteracoes.push({
+          tipo_conteudo: "alteracao_oe",
+          categoria: "geral_alteracoes_oe",
+          titulo: titulo,
+          numero: numero || null,
+          data_publicacao: dataCompleta,
+          proponentes: proponentes || null,
+          estado: estado || null,
+          apresentada: apresentada || null,
+          incide: incide || null,
+          tipo: tipo || null,
+          resumo: `Alteração OE ${numero} apresentada por ${proponentes} - Estado: ${estado}`,
+          url: limparUrl(detalhesUrl),
+          documento_pdf: documentoUrl ? limparUrl(documentoUrl) : null,
+          fonte: "parlamento",
+        });
+      } else {
+        console.log(`  ❌ DEBUG Row ${index}: Falta número ou URL de detalhes`);
+      }
+    });
+
+    console.log(`  📊 Encontradas: ${alteracoes.length} alterações OE`);
+    return alteracoes;
+  } catch (error) {
+    console.error(`  ❌ Erro ao scraping Alterações OE:`, error.message);
+    return [];
+  }
+}
+
 // SCRAPER PRINCIPAL - Todas as páginas gerais
 export async function scrapeTodasPaginasGerais() {
   console.log("\n🚀 ========== SCRAPING DAS PÁGINAS GERAIS ==========");
   const inicio = Date.now();
 
-  const [iniciativas, perguntas, votacoes, sumulas] = await Promise.all([
+  const [iniciativas, perguntas, votacoes, sumulas, alteracoesOE] = await Promise.all([
     scrapeUltimasIniciativas(),
     scrapePerguntasRequerimentos(),
     scrapeVotacoes(),
     scrapeSumulasConferencia(),
+    scrapeAlteracoesOE(),
   ]);
 
   const todosDocumentos = [
@@ -402,6 +508,7 @@ export async function scrapeTodasPaginasGerais() {
     ...perguntas,
     ...votacoes,
     ...sumulas,
+    ...alteracoesOE,
   ];
 
   console.log(`\n📦 Total de documentos a processar: ${todosDocumentos.length}`);
@@ -441,7 +548,8 @@ export async function scrapeTodasPaginasGerais() {
   console.log(`  ├─ Iniciativas: ${iniciativas.length}`);
   console.log(`  ├─ Perguntas/Requerimentos: ${perguntas.length}`);
   console.log(`  ├─ Votações: ${votacoes.length}`);
-  console.log(`  └─ Súmulas: ${sumulas.length}`);
+  console.log(`  ├─ Súmulas: ${sumulas.length}`);
+  console.log(`  └─ Alterações OE: ${alteracoesOE.length}`);
   console.log(`\nNovos documentos guardados: ${novosGuardados}`);
   console.log(`Duplicados ignorados: ${duplicadosIgnorados}`);
   console.log(`Erros: ${erros}`);
