@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { getCategoriaInfo } from "../utils/categories";
-import { BoltIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { getStakeholderInfo } from "../utils/stakeholders";
+import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useUser } from "../contexts/UserContext";
 import DocumentDetailModal from "./DocumentDetailModal";
 import CategoryDocumentsModal from "./CategoryDocumentsModal";
 
-const RadarFullScreen = ({ stats, documents }) => {
+const RadarFullScreen = ({ stats, documents, viewMode }) => {
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const { categoriasFavoritas, tiposConteudoVisiveis, foiLido, estaArquivado } = useUser();
+  const { categoriasFavoritas, stakeholdersFavoritos, tiposConteudoVisiveis, foiLido, estaArquivado } = useUser();
 
-  // Filtrar apenas categorias favoritas
-  const categoriasList = categoriasFavoritas;
+  // Definir lista de categorias baseado no modo
+  const categoriasList = viewMode === 'stakeholders'
+    ? stakeholdersFavoritos
+    : categoriasFavoritas;
+
   const angleStep = 360 / categoriasList.length;
 
   // Filtrar documentos por tipo de conteúdo visível
@@ -24,9 +28,12 @@ const RadarFullScreen = ({ stats, documents }) => {
   const getCategoryData = (categoria) => {
     const stat = stats.porCategoria?.find((s) => s._id === categoria);
     const total = stat?.total || 0;
-    const categoryDocs = documentosFiltrados.filter(
-      (d) => d.categoria === categoria
-    );
+    
+    // ✅ CORRIGIDO: Filtrar sempre por d.categoria (funciona para ambos os modos)
+    const categoryDocs = documentosFiltrados.filter((d) => {
+      return d.categoria === categoria;
+    });
+    
     // Contar apenas documentos não arquivados
     const activeCount = categoryDocs.filter((doc) => !estaArquivado(doc.id)).length;
     return { total, documents: categoryDocs, activeCount };
@@ -127,48 +134,66 @@ const RadarFullScreen = ({ stats, documents }) => {
         })}
       </svg>
 
-      {/* CENTRO - Stats Totais - NOVA COR */}
+      {/* CENTRO - Logo Dédalo */}
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
         <div className="relative group">
-          {/* Glow effect - AZUL */}
-          <div className="absolute inset-0 rounded-full blur-2xl transition-all"
-            style={{ backgroundColor: 'rgba(39, 170, 226, 0.2)' }}
-          ></div>
+          {/* Glow effect animado - AZUL */}
+          <div className="absolute inset-0 rounded-full blur-3xl transition-all"
+            style={{ backgroundColor: 'rgba(39, 170, 226, 0.4)' }}
+          >
+            <div className="w-full h-full rounded-full animate-pulse"
+              style={{ backgroundColor: 'rgba(39, 170, 226, 0.2)' }}
+            ></div>
+          </div>
 
           {/* Card - ROXO ESCURO com borda AZUL */}
-          <div className="relative backdrop-blur-xl rounded-full p-10 border shadow-2xl w-40 h-40 flex items-center justify-center"
+          <div className="relative backdrop-blur-xl rounded-full border-2 shadow-2xl w-44 h-44 flex items-center justify-center transition-all group-hover:scale-105"
             style={{ 
-              backgroundColor: 'rgba(38, 34, 97, 0.9)',
-              borderColor: 'rgba(39, 170, 226, 0.3)'
+              backgroundColor: 'rgba(38, 34, 97, 0.95)',
+              borderColor: 'rgba(39, 170, 226, 0.5)',
+              boxShadow: '0 0 50px rgba(39, 170, 226, 0.3)'
             }}
           >
-            <div className="text-center">
-              <div className="text-5xl font-black text-white mb-1">
-                {stats.totalGeral || 0}
+            {/* Anel interno decorativo */}
+            <div className="absolute inset-3 rounded-full border border-blue-400/20"></div>
+            
+            <div className="text-center relative z-10 flex flex-col items-center">
+              {/* Logo Dédalo */}
+              <div className="relative mb-2">
+                <div className="absolute inset-0 rounded-xl blur-lg opacity-60"
+                  style={{ background: 'linear-gradient(to bottom right, #27aae2, #1e88b5)' }}
+                ></div>
+                <img 
+                  src="/dedalo.png" 
+                  alt="Dédalo Logo" 
+                  className="w-20 h-20 object-contain relative z-10"
+                />
               </div>
-              {/* Texto AZUL */}
-              <div className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: '#27aae2' }}
-              >
-                Total
-              </div>
-              {/* Documentos de Hoje */}
+
+              {/* Documentos de Hoje (só se existirem) */}
               {stats.documentosHoje > 0 && (
-                <div className="mt-3 pt-3 border-t border-slate-700/50">
-                  <div className="flex items-center justify-center gap-1.5">
-                    {/* Ponto AZUL */}
-                    <div className="w-1.5 h-1.5 rounded-full animate-pulse"
-                      style={{ backgroundColor: '#27aae2' }}
-                    ></div>
-                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wide">
-                      Hoje
-                    </span>
-                    <span className="text-xs font-bold text-white">
-                      {stats.documentosHoje}
+                <div className="mt-2 pt-2 border-t border-slate-700/40 w-full">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                      <span className="text-2xl font-black text-white">{stats.documentosHoje}</span>
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      Novos Hoje
                     </span>
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Efeito de brilho rotativo na borda */}
+            <div className="absolute inset-0 rounded-full overflow-hidden opacity-40">
+              <div className="absolute inset-0"
+                style={{
+                  background: 'conic-gradient(from 0deg, transparent 0deg, rgba(39, 170, 226, 0.6) 60deg, transparent 120deg)',
+                  animation: 'spin 6s linear infinite'
+                }}
+              ></div>
             </div>
           </div>
         </div>
@@ -177,7 +202,12 @@ const RadarFullScreen = ({ stats, documents }) => {
       {/* CATEGORIAS - Cards com NOVAS CORES */}
       {categoriasList.map((categoria, index) => {
         const angle = (angleStep * index - 90) * (Math.PI / 180);
-        const info = getCategoriaInfo(categoria);
+
+        // ✅ Obter informação baseada no modo
+        const info = viewMode === 'stakeholders'
+          ? getStakeholderInfo(categoria)
+          : getCategoriaInfo(categoria);
+
         const { total, documents: categoryDocs, activeCount } = getCategoryData(categoria);
         const Icon = info.icon;
 
@@ -266,6 +296,13 @@ const RadarFullScreen = ({ stats, documents }) => {
                     {info.nome}
                   </div>
 
+                  {/* Tipo de stakeholder (só no modo stakeholders) */}
+                  {viewMode === 'stakeholders' && info.tipo && (
+                    <div className="text-[9px] text-slate-500 text-center mt-1">
+                      {info.tipo}
+                    </div>
+                  )}
+
                   {/* Ver Mais - AZUL */}
                   {isHovered && categoryDocs.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-slate-700/50 w-full">
@@ -286,14 +323,15 @@ const RadarFullScreen = ({ stats, documents }) => {
 
       {/* Modal de Documentos da Categoria */}
       {selectedCategory && !selectedDocument && (
-        <CategoryDocumentsModal
-          category={selectedCategory}
-          onClose={() => setSelectedCategory(null)}
-          onSelectDocument={(doc) => {
-            setSelectedDocument(doc);
-          }}
-        />
-      )}
+  <CategoryDocumentsModal
+    category={selectedCategory}
+    viewMode={viewMode}  // ✅ ADICIONA ISTO
+    onClose={() => setSelectedCategory(null)}
+    onSelectDocument={(doc) => {
+      setSelectedDocument(doc);
+    }}
+  />
+)}
 
       {/* Modal de Detalhe do Documento */}
       {selectedDocument && (
