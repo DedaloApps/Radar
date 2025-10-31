@@ -263,7 +263,7 @@ const STAKEHOLDERS_CONFIG = {
     url: "https://www.concorrencia.pt/pt/noticias-comunicados-e-intervencoes",
     baseUrl: "https://www.concorrencia.pt",
     nome: "AdC",
-    categoria: "stake_economia",
+    categoria: "noticia",
     seletores: [
       ".text-wrapper a",
       ".title a",
