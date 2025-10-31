@@ -142,19 +142,17 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "noticia",
   },
   igamaot: {
-    url: "https://www.igamaot.gov.pt/pt/espaco-publico/destaques#1",
-    baseUrl: "https://www.igamaot.gov.pt",
-    nome: "IGAMAOT",
-    categoria: "stake_ambiente",
-    seletores: [
-      ".info .title a",
-      ".title a[href*='/destaques/']",
-      "div.title a",
-    ],
-    seletorData: ".tag a",
-    seletorResumo: ".title a",
-    tipo_conteudo: "noticia",
-  },
+  url: "https://www.igamaot.gov.pt/pt/espaco-publico/destaques#1",
+  baseUrl: "https://www.igamaot.gov.pt",
+  nome: "IGAMAOT",
+  categoria: "stake_ambiente",
+  seletores: [
+    ".main-info .title a", // ✅ Título + link
+  ],
+  seletorData: ".main-info .tag a", // ✅ Data: "2025-10-28"
+  seletorResumo: ".text p", // ✅ Resumo
+  tipo_conteudo: "noticia",
+},
   dgav: {
     url: "https://www.dgav.pt/destaques/noticias/",
     baseUrl: "https://www.dgav.pt",
@@ -344,20 +342,31 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "noticia",
   },
   ers: {
-    url: "https://www.ers.pt/pt/comunicacao/noticias-1/",
-    nome: "ERS",
-    categoria: "stake_saude",
-    ignorarSSL: true,
-    seletor: ".noticia-titulo a",
-    tipo_conteudo: "noticia",
-  },
-  igas: {
-    url: "https://www.igas.min-saude.pt/comunicacao/destaques/",
-    nome: "IGAS",
-    categoria: "stake_saude",
-    seletor: ".destaque-link",
-    tipo_conteudo: "noticia",
-  },
+  url: "https://www.ers.pt/pt/comunicacao/noticias", // ✅ URL corrigido
+  baseUrl: "https://www.ers.pt",
+  nome: "ERS",
+  categoria: "stake_saude",
+  ignorarSSL: true,
+  seletores: [
+    ".TextoCorrido", // ✅ Título está aqui
+  ],
+  seletorLink: ".pr-box-news-text a.ers-more", // ✅ Link está aqui
+  seletorData: ".news-hour span.color-ers", // ✅ Data: "21.10.2025"
+  seletorResumo: ".TextoCorrido",
+  tipo_conteudo: "noticia",
+},
+igas: {
+  url: "https://www.igas.min-saude.pt/category/noticias-e-eventos/noticias/", // ✅ URL corrigido
+  baseUrl: "https://www.igas.min-saude.pt",
+  nome: "IGAS",
+  categoria: "stake_saude",
+  seletores: [
+    ".smallNews a.notTitleLink", // ✅ Título + Link no mesmo elemento
+  ],
+  seletorData: ".smallNews span[style*='font-size: 0.77']", // ✅ Data: "23-10-2025"
+  seletorResumo: ".smallNews > div > span:nth-of-type(3)", // ✅ 3º span tem o resumo
+  tipo_conteudo: "noticia",
+},
 
   // IMOBILIÁRIO/HABITAÇÃO
   cmvm: {
@@ -387,18 +396,18 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "noticia",
   },
   ihru: {
-    url: "https://www.ihru.pt/web/guest/noticias",
-    baseUrl: "https://www.ihru.pt",
-    nome: "IHRU",
-    categoria: "stake_imobiliario",
-    seletores: [
-      ".noticiasLink a",
-      ".noticiasItem .noticiasLink a",
-    ],
-    seletorData: ".noticiasDate",
-    seletorResumo: ".noticiasTitle",
-    tipo_conteudo: "noticia",
-  },
+  url: "https://www.ihru.pt/web/guest/noticias",
+  baseUrl: "https://www.ihru.pt",
+  nome: "IHRU",
+  categoria: "stake_imobiliario",
+  seletores: [
+    ".noticiasTitle", // ✅ Extrair título daqui
+  ],
+  seletorLink: ".noticiasLink a", // ✅ Link está aqui
+  seletorData: ".noticiasDate", // ✅ Data: "29 out 2025"
+  seletorResumo: ".noticiasTitle",
+  tipo_conteudo: "noticia",
+},
 
   // ============================================
   // PARTIDOS POLÍTICOS
