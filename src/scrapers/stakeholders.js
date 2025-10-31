@@ -499,25 +499,25 @@ const STAKEHOLDERS_CONFIG = {
   },
 
   // ========== CHEGA ==========
-  chega_observador: {
-    url: "https://observador.pt/seccao/politica/chega/",
-    baseUrl: "https://observador.pt",
-    nome: "CHEGA",
-    fonte_original: "Observador",
-    categoria: "stake_partidos",
-    seletores: [
-      ".editorial-grid .mod-posttype-post h1.title a",
-    ],
-    seletorData: "time.timeago",
-    seletorResumo: ".lead",
-    tipo_conteudo: "noticia",
-    palavras_chave: [
-      "CHEGA",
-      "Chega",
-      "André Ventura",
-      "Ventura",
-    ],
-  },
+chega_observador: {
+  url: "https://observador.pt/seccao/politica/partido-chega/",  // ✅ CORRIGIDO
+  baseUrl: "https://observador.pt",
+  nome: "CHEGA",
+  fonte_original: "Observador",
+  categoria: "stake_partidos",
+  seletores: [
+    ".editorial-grid .mod-posttype-post h1.title a",
+  ],
+  seletorData: "time.timeago",
+  seletorResumo: ".lead",
+  tipo_conteudo: "noticia",
+  palavras_chave: [
+    "CHEGA",
+    "Chega",
+    "André Ventura",
+    "Ventura",
+  ],
+},
 
   chega_cnn: {
     url: "https://cnnportugal.iol.pt/noticias/chega",
@@ -588,25 +588,25 @@ const STAKEHOLDERS_CONFIG = {
   },
 
   // ========== LIVRE ==========
-  livre_observador: {
-    url: "https://observador.pt/seccao/politica/livre/",
-    baseUrl: "https://observador.pt",
-    nome: "LIVRE",
-    fonte_original: "Observador",
-    categoria: "stake_partidos",
-    seletores: [
-      ".editorial-grid .mod-posttype-post h1.title a",
-    ],
-    seletorData: "time.timeago",
-    seletorResumo: ".lead",
-    tipo_conteudo: "noticia",
-    palavras_chave: [
-      "LIVRE",
-      "Livre",
-      "Rui Tavares",
-      "partido Livre",
-    ],
-  },
+livre_observador: {
+  url: "https://observador.pt/seccao/politica/partido-livre-2/",  // ✅ CORRIGIDO
+  baseUrl: "https://observador.pt",
+  nome: "LIVRE",
+  fonte_original: "Observador",
+  categoria: "stake_partidos",
+  seletores: [
+    ".editorial-grid .mod-posttype-post h1.title a",
+  ],
+  seletorData: "time.timeago",
+  seletorResumo: ".lead",
+  tipo_conteudo: "noticia",
+  palavras_chave: [
+    "LIVRE",
+    "Livre",
+    "Rui Tavares",
+    "partido Livre",
+  ],
+},
 
   livre_cnn: {
     url: "https://cnnportugal.iol.pt/noticias/livre",
@@ -631,27 +631,27 @@ const STAKEHOLDERS_CONFIG = {
   },
 
   // ========== PCP ==========
-  pcp_observador: {
-    url: "https://observador.pt/seccao/politica/pcp/",
-    baseUrl: "https://observador.pt",
-    nome: "PCP",
-    fonte_original: "Observador",
-    categoria: "stake_partidos",
-    seletores: [
-      ".editorial-grid .mod-posttype-post h1.title a",
-    ],
-    seletorData: "time.timeago",
-    seletorResumo: ".lead",
-    tipo_conteudo: "noticia",
-    palavras_chave: [
-      "PCP",
-      "Partido Comunista",
-      "comunista",
-      "comunistas",
-      "Paulo Raimundo",
-      "Jerónimo de Sousa",
-    ],
-  },
+pcp_observador: {
+  url: "https://observador.pt/seccao/politica/pcp-4/",  // ✅ CORRIGIDO
+  baseUrl: "https://observador.pt",
+  nome: "PCP",
+  fonte_original: "Observador",
+  categoria: "stake_partidos",
+  seletores: [
+    ".editorial-grid .mod-posttype-post h1.title a",
+  ],
+  seletorData: "time.timeago",
+  seletorResumo: ".lead",
+  tipo_conteudo: "noticia",
+  palavras_chave: [
+    "PCP",
+    "Partido Comunista",
+    "comunista",
+    "comunistas",
+    "Paulo Raimundo",
+    "Jerónimo de Sousa",
+  ],
+},
 
   pcp_cnn: {
     url: "https://cnnportugal.iol.pt/noticias/pcp",
@@ -677,27 +677,27 @@ const STAKEHOLDERS_CONFIG = {
   },
 
   // ========== BE (Bloco de Esquerda) ==========
-  be_observador: {
-    url: "https://observador.pt/seccao/politica/be/",
-    baseUrl: "https://observador.pt",
-    nome: "BE",
-    fonte_original: "Observador",
-    categoria: "stake_partidos",
-    seletores: [
-      ".editorial-grid .mod-posttype-post h1.title a",
-    ],
-    seletorData: "time.timeago",
-    seletorResumo: ".lead",
-    tipo_conteudo: "noticia",
-    palavras_chave: [
-      "BE",
-      "Bloco de Esquerda",
-      "bloquista",
-      "bloquistas",
-      "Mariana Mortágua",
-      "Catarina Martins",
-    ],
-  },
+be_observador: {
+  url: "https://observador.pt/seccao/politica/bloco-de-esquerda/",  // ✅ CORRIGIDO
+  baseUrl: "https://observador.pt",
+  nome: "BE",
+  fonte_original: "Observador",
+  categoria: "stake_partidos",
+  seletores: [
+    ".editorial-grid .mod-posttype-post h1.title a",
+  ],
+  seletorData: "time.timeago",
+  seletorResumo: ".lead",
+  tipo_conteudo: "noticia",
+  palavras_chave: [
+    "BE",
+    "Bloco de Esquerda",
+    "bloquista",
+    "bloquistas",
+    "Mariana Mortágua",
+    "Catarina Martins",
+  ],
+},
 
   be_cnn: {
     url: "https://cnnportugal.iol.pt/noticias/be",
@@ -766,25 +766,27 @@ const STAKEHOLDERS_CONFIG = {
   },
 
   // ========== JPP (Juntos Pelo Povo) ==========
-  jpp_observador: {
-    url: "https://observador.pt/seccao/politica/jpp/",
-    baseUrl: "https://observador.pt",
-    nome: "JPP",
-    fonte_original: "Observador",
-    categoria: "stake_partidos",
-    seletores: [
-      ".editorial-grid .mod-posttype-post h1.title a",
-    ],
-    seletorData: "time.timeago",
-    seletorResumo: ".lead",
-    tipo_conteudo: "noticia",
-    palavras_chave: [
-      "JPP",
-      "Juntos Pelo Povo",
-      "Élvio Sousa",
-      "partido JPP",
-    ],
-  },
+jpp_observador: {
+  url: "https://observador.pt/seccao/politica/jpp-juntos-pelo-povo/",  // ✅ TENTA ESTE
+  // OU se não funcionar, pode ser:
+  // url: "https://observador.pt/seccao/politica/juntos-pelo-povo/",
+  baseUrl: "https://observador.pt",
+  nome: "JPP",
+  fonte_original: "Observador",
+  categoria: "stake_partidos",
+  seletores: [
+    ".editorial-grid .mod-posttype-post h1.title a",
+  ],
+  seletorData: "time.timeago",
+  seletorResumo: ".lead",
+  tipo_conteudo: "noticia",
+  palavras_chave: [
+    "JPP",
+    "Juntos Pelo Povo",
+    "Élvio Sousa",
+    "partido JPP",
+  ],
+},
 
   jpp_cnn: {
     url: "https://cnnportugal.iol.pt/noticias/jpp",
