@@ -175,15 +175,14 @@ const STAKEHOLDERS_CONFIG = {
     nome: "DGEG",
     categoria: "stake_ambiente",
     seletores: [
-      ".card-button a",
-      ".card .card-button a",
-      "a.btn.btn-link",
+      ".card",  // ✅ Seleciona o card inteiro
     ],
     seletorData: ".card-content",
     seletorResumo: ".card-content p",
     timeout: 20000,
     ignorarSSL: true,
     tipo_conteudo: "noticia",
+    extrairDoCard: true,  // ✅ Flag especial
   },
   adene: {
     url: "https://www.adene.pt/comunicacao/noticias/",
@@ -274,19 +273,18 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "comunicado",
   },
   aduaneiro: {
-    url: "https://info-aduaneiro.portaldasfinancas.gov.pt/pt/noticias/Pages/noticias.aspx",
-    baseUrl: "https://info-aduaneiro.portaldasfinancas.gov.pt",
-    nome: "AT Aduaneiro",
-    categoria: "stake_economia",
-    seletores: [
-      ".col-sm-9 a.more-btn",
-      "a.more-btn",
-      ".col-sm-9 a",
-    ],
-    seletorData: ".col-sm-9",
-    seletorResumo: ".col-sm-9 p",
-    tipo_conteudo: "noticia",
-  },
+  url: "https://info-aduaneiro.portaldasfinancas.gov.pt/pt/noticias/Pages/noticias.aspx",
+  baseUrl: "https://info-aduaneiro.portaldasfinancas.gov.pt",
+  nome: "AT Aduaneiro",
+  categoria: "stake_economia",
+  seletores: [
+    ".col-sm-9 h4",  // ✅ MUDANÇA: extrair título do h4
+  ],
+  seletorLink: ".col-sm-9 a.more-btn",  // ✅ NOVO: link está aqui
+  seletorData: ".col-sm-9",
+  seletorResumo: ".col-sm-9 p",
+  tipo_conteudo: "noticia",
+},
   bportugal: {
     url: "https://www.bportugal.pt/comunicados/media/banco-de-portugal",
     baseUrl: "https://www.bportugal.pt",
@@ -371,7 +369,7 @@ const STAKEHOLDERS_CONFIG = {
       ".gc-card-layout__title span",
       ".gc-card-layout__title",
     ],
-    seletorData: ".gc-date", // Extração especial
+    seletorData: ".gc-date",
     seletorResumo: ".gc-card-layout__description",
     tipo_conteudo: "comunicado",
   },
@@ -873,91 +871,114 @@ async function scrapeStakeholder(stakeholderId, config) {
           console.log(`   ✓ Seletor funcionou: "${seletor}" (${elementos.length} elementos)`);
 
           elementos.each((index, element) => {
-            if (index >= 30) return false;
+  if (index >= 30) return false;
 
-            const $link = $(element);
-            const titulo = $link.text().trim();
-            const url = $link.attr("href");
+  // ✅ LÓGICA ESPECIAL PARA EXTRAÇÃO
+  let titulo, url;
+  
+  if (config.extrairDoCard) {
+    // Para sites como DGEG onde título e link estão em elementos separados
+    const $card = $(element);
+    titulo = $card.find('.card-title h1').text().trim();
+    const $link = $card.find('.card-button a');
+    url = $link.attr("href");
+  } else {
+    // Lógica normal para outros sites
+    const $element = $(element);
+    titulo = $element.text().trim();
+    
+    // ✅ NOVO: Suporte para seletorLink
+    if (config.seletorLink) {
+      const $container = $element.closest("li, article, .news-item, .row, .noticiasItem");
+      url = $container.find(config.seletorLink).attr("href");
+    } else {
+      url = $element.attr("href");
+    }
+  }
 
-            if (titulo && url && titulo.length > 10) {
-              const baseUrl = config.baseUrl || config.url;
-              const urlCompleta = limparUrl(baseUrl, url);
+  if (titulo && url && titulo.length > 10) {
+    const baseUrl = config.baseUrl || config.url;
+    const urlCompleta = limparUrl(baseUrl, url);
 
-              // Filtro para partidos
-              if (config.categoria === "stake_partidos" && config.palavras_chave) {
-                const tituloLower = titulo.toLowerCase();
-                const contemPalavraChave = config.palavras_chave.some(palavra => 
-                  tituloLower.includes(palavra.toLowerCase())
-                );
-                if (!contemPalavraChave) return;
-              }
+    // Filtro para partidos
+    if (config.categoria === "stake_partidos" && config.palavras_chave) {
+      const tituloLower = titulo.toLowerCase();
+      const contemPalavraChave = config.palavras_chave.some(palavra => 
+        tituloLower.includes(palavra.toLowerCase())
+      );
+      if (!contemPalavraChave) return;
+    }
 
-              // ✅ EXTRAÇÃO ESPECIAL PARA CMVM
-              let data = new Date().toISOString().split("T")[0];
-              
-              if (stakeholderId === 'cmvm') {
-                const $container = $link.closest(".gc-card-layout");
-                const dia = $container.find(".gc-date__day").text().trim();
-                const mes = $container.find(".gc-date__month").text().trim();
-                const ano = $container.find(".gc-date__year").text().trim();
-                
-                if (dia && mes && ano) {
-                  const mesesPT = {
-                    'Jan': '01', 'Fev': '02', 'Mar': '03', 'Abr': '04',
-                    'Mai': '05', 'Jun': '06', 'Jul': '07', 'Ago': '08',
-                    'Set': '09', 'Out': '10', 'Nov': '11', 'Dez': '12'
-                  };
-                  const mesNum = mesesPT[mes] || '01';
-                  data = `${ano}-${mesNum}-${dia.padStart(2, '0')}`;
-                }
-              } else if (config.seletorData) {
-                // Extração normal
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, .noticiasItem, li, div, .row-fluid, .dvNew, .uk-card, .mod, .post-block");
-                const dataTexto = $container.find(config.seletorData).first().text().trim();
-                if (dataTexto) {
-                  const dataParsed = parseData(dataTexto);
-                  if (dataParsed) data = dataParsed;
-                }
-              }
+    // ✅ EXTRAÇÃO ESPECIAL PARA CMVM
+    let data = new Date().toISOString().split("T")[0];
+    
+    if (stakeholderId === 'cmvm') {
+      const $container = $(element).closest(".gc-card-layout");
+      const dia = $container.find(".gc-date__day").text().trim();
+      const mes = $container.find(".gc-date__month").text().trim();
+      const ano = $container.find(".gc-date__year").text().trim();
+      
+      if (dia && mes && ano) {
+        const mesesPT = {
+          'Jan': '01', 'Fev': '02', 'Mar': '03', 'Abr': '04',
+          'Mai': '05', 'Jun': '06', 'Jul': '07', 'Ago': '08',
+          'Set': '09', 'Out': '10', 'Nov': '11', 'Dez': '12'
+        };
+        const mesNum = mesesPT[mes] || '01';
+        data = `${ano}-${mesNum}-${dia.padStart(2, '0')}`;
+      }
+    } else if (config.seletorData) {
+      // Extração normal
+      const $container = config.extrairDoCard 
+        ? $(element)
+        : $(element).closest("article, .news-item, .entry, .post, .destaque, .noticia, .noticiasItem, li, div, .row-fluid, .dvNew, .uk-card, .mod, .post-block, .row");
+      const dataTexto = $container.find(config.seletorData).first().text().trim();
+      if (dataTexto) {
+        const dataParsed = parseData(dataTexto);
+        if (dataParsed) data = dataParsed;
+      }
+    }
 
-              // Extrair resumo
-              let resumo = titulo.substring(0, 200);
-              if (config.seletorResumo) {
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, .noticiasItem, li, div, .row-fluid, .dvNew, .uk-card, .mod, .post-block");
-                const resumoTexto = $container.find(config.seletorResumo).first().text().trim();
-                if (resumoTexto && resumoTexto.length > 20) {
-                  resumo = resumoTexto.substring(0, 300);
-                }
-              }
+    // Extrair resumo
+    let resumo = titulo.substring(0, 200);
+    if (config.seletorResumo) {
+      const $container = config.extrairDoCard 
+        ? $(element)
+        : $(element).closest("article, .news-item, .entry, .post, .destaque, .noticia, .noticiasItem, li, div, .row-fluid, .dvNew, .uk-card, .mod, .post-block, .row");
+      const resumoTexto = $container.find(config.seletorResumo).first().text().trim();
+      if (resumoTexto && resumoTexto.length > 20) {
+        resumo = resumoTexto.substring(0, 300);
+      }
+    }
 
-              // Filtro adicional para partidos
-              if (config.categoria === "stake_partidos" && config.palavras_chave) {
-                const resumoLower = resumo.toLowerCase();
-                const contemPalavraChave = config.palavras_chave.some(palavra => 
-                  resumoLower.includes(palavra.toLowerCase())
-                );
-                if (!contemPalavraChave) return;
-              }
+    // Filtro adicional para partidos
+    if (config.categoria === "stake_partidos" && config.palavras_chave) {
+      const resumoLower = resumo.toLowerCase();
+      const contemPalavraChave = config.palavras_chave.some(palavra => 
+        resumoLower.includes(palavra.toLowerCase())
+      );
+      if (!contemPalavraChave) return;
+    }
 
-              const documento = {
-                tipo_conteudo: config.tipo_conteudo,
-                tipo_radar: "stakeholders",
-                categoria: config.categoria,
-                titulo: limparTitulo(titulo), // ✅ LIMPAR TÍTULO
-                data_publicacao: data,
-                url: urlCompleta,
-                fonte: "stakeholders",
-                entidades: config.nome,
-                resumo: resumo,
-              };
+    const documento = {
+      tipo_conteudo: config.tipo_conteudo,
+      tipo_radar: "stakeholders",
+      categoria: config.categoria,
+      titulo: limparTitulo(titulo),
+      data_publicacao: data,
+      url: urlCompleta,
+      fonte: "stakeholders",
+      entidades: config.nome,
+      resumo: resumo,
+    };
 
-              if (config.categoria === "stake_partidos" && config.fonte_original) {
-                documento.fonte_original = config.fonte_original;
-              }
+    if (config.categoria === "stake_partidos" && config.fonte_original) {
+      documento.fonte_original = config.fonte_original;
+    }
 
-              documentos.push(documento);
-            }
-          });
+    documentos.push(documento);
+  }
+});
 
           break;
         } else {
