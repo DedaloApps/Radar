@@ -81,7 +81,7 @@ const STAKEHOLDERS_CONFIG = {
     tipo_conteudo: "noticia",
   },
 
-  // ✅ LABORAL
+  // LABORAL
   act: {
     url: "https://portal.act.gov.pt/Pages/TodasNoticias.aspx",
     baseUrl: "https://portal.act.gov.pt",
@@ -399,58 +399,413 @@ const STAKEHOLDERS_CONFIG = {
   },
 
   // ============================================
-  // ✅ PARTIDOS - COM CAMPO fonte_original
+  // PARTIDOS POLÍTICOS
   // ============================================
-  
-  // PSD - Site Oficial
-  psd_oficial: {
-    url: "https://www.psd.pt/pt/noticias",
-    baseUrl: "https://www.psd.pt",
-    nome: "PSD",
-    fonte_original: "Site Oficial",  // ✅ NOVO CAMPO
-    categoria: "stake_partidos",
-    seletores: [
-      "a.news__link",
-      ".news__row a",
-      "a[href*='/noticias/']",
-    ],
-    seletorTitulo: ".news__title",
-    seletorData: ".news__date",
-    seletorResumo: null,
-    tipo_conteudo: "noticia",
-  },
 
-  // PSD - Observador
+  // ========== PSD ==========
   psd_observador: {
     url: "https://observador.pt/seccao/politica/psd/",
     baseUrl: "https://observador.pt",
     nome: "PSD",
-    fonte_original: "Observador",  // ✅ NOVO CAMPO
+    fonte_original: "Observador",
     categoria: "stake_partidos",
     seletores: [
-      ".mod .title a",
-      "h1.title a",
-      ".image a",
+      ".editorial-grid .mod-posttype-post h1.title a",
     ],
     seletorData: "time.timeago",
     seletorResumo: ".lead",
     tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PSD",
+      "Social Democrata",
+      "social-democrata",
+      "Luís Montenegro",
+      "Montenegro",
+      "Marques Mendes",
+      "Pedro Passos Coelho",
+    ],
   },
 
-  // PSD - CNN Portugal
   psd_cnn: {
     url: "https://cnnportugal.iol.pt/noticias/PSD",
     baseUrl: "https://cnnportugal.iol.pt",
     nome: "PSD",
-    fonte_original: "CNN Portugal",  // ✅ NOVO CAMPO
+    fonte_original: "CNN Portugal",
     categoria: "stake_partidos",
     seletores: [
       ".item a",
+      ".item-title a",
+      "article .item a",
     ],
-    seletorTitulo: ".item-title",
     seletorData: ".item-date",
-    seletorResumo: null,
+    seletorResumo: ".item-description",
     tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PSD",
+      "Social Democrata",
+      "social-democrata",
+      "Luís Montenegro",
+      "Montenegro",
+      "Marques Mendes",
+    ],
+  },
+
+  // ========== PS ==========
+  ps_observador: {
+    url: "https://observador.pt/seccao/politica/ps/",
+    baseUrl: "https://observador.pt",
+    nome: "PS",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PS",
+      "Partido Socialista",
+      "socialista",
+      "socialistas",
+      "Pedro Nuno Santos",
+      "Pedro Nuno",
+      "António Costa",
+    ],
+  },
+
+  ps_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/PS",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "PS",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PS",
+      "Partido Socialista",
+      "socialista",
+      "socialistas",
+      "Pedro Nuno Santos",
+      "Pedro Nuno",
+    ],
+  },
+
+  // ========== CHEGA ==========
+  chega_observador: {
+    url: "https://observador.pt/seccao/politica/chega/",
+    baseUrl: "https://observador.pt",
+    nome: "CHEGA",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "CHEGA",
+      "Chega",
+      "André Ventura",
+      "Ventura",
+    ],
+  },
+
+  chega_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/chega",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "CHEGA",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "CHEGA",
+      "Chega",
+      "André Ventura",
+      "Ventura",
+    ],
+  },
+
+  // ========== IL (Iniciativa Liberal) ==========
+  il_observador: {
+    url: "https://observador.pt/seccao/politica/iniciativa-liberal/",
+    baseUrl: "https://observador.pt",
+    nome: "IL",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "IL",
+      "Iniciativa Liberal",
+      "liberal",
+      "liberais",
+      "Rui Rocha",
+      "João Cotrim Figueiredo",
+    ],
+  },
+
+  il_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/iniciativa-liberal",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "IL",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "IL",
+      "Iniciativa Liberal",
+      "liberal",
+      "liberais",
+      "Rui Rocha",
+    ],
+  },
+
+  // ========== LIVRE ==========
+  livre_observador: {
+    url: "https://observador.pt/seccao/politica/livre/",
+    baseUrl: "https://observador.pt",
+    nome: "LIVRE",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "LIVRE",
+      "Livre",
+      "Rui Tavares",
+      "partido Livre",
+    ],
+  },
+
+  livre_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/livre",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "LIVRE",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "LIVRE",
+      "Livre",
+      "Rui Tavares",
+      "partido Livre",
+    ],
+  },
+
+  // ========== PCP ==========
+  pcp_observador: {
+    url: "https://observador.pt/seccao/politica/pcp/",
+    baseUrl: "https://observador.pt",
+    nome: "PCP",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PCP",
+      "Partido Comunista",
+      "comunista",
+      "comunistas",
+      "Paulo Raimundo",
+      "Jerónimo de Sousa",
+    ],
+  },
+
+  pcp_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/pcp",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "PCP",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PCP",
+      "Partido Comunista",
+      "comunista",
+      "comunistas",
+      "Paulo Raimundo",
+    ],
+  },
+
+  // ========== BE (Bloco de Esquerda) ==========
+  be_observador: {
+    url: "https://observador.pt/seccao/politica/be/",
+    baseUrl: "https://observador.pt",
+    nome: "BE",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "BE",
+      "Bloco de Esquerda",
+      "bloquista",
+      "bloquistas",
+      "Mariana Mortágua",
+      "Catarina Martins",
+    ],
+  },
+
+  be_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/be",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "BE",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "BE",
+      "Bloco de Esquerda",
+      "bloquista",
+      "bloquistas",
+      "Mariana Mortágua",
+    ],
+  },
+
+  // ========== PAN ==========
+  pan_observador: {
+    url: "https://observador.pt/seccao/politica/pan/",
+    baseUrl: "https://observador.pt",
+    nome: "PAN",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PAN",
+      "Pessoas-Animais-Natureza",
+      "Inês Sousa Real",
+      "partido PAN",
+    ],
+  },
+
+  pan_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/pan",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "PAN",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "PAN",
+      "Pessoas-Animais-Natureza",
+      "Inês Sousa Real",
+      "partido PAN",
+    ],
+  },
+
+  // ========== JPP (Juntos Pelo Povo) ==========
+  jpp_observador: {
+    url: "https://observador.pt/seccao/politica/jpp/",
+    baseUrl: "https://observador.pt",
+    nome: "JPP",
+    fonte_original: "Observador",
+    categoria: "stake_partidos",
+    seletores: [
+      ".editorial-grid .mod-posttype-post h1.title a",
+    ],
+    seletorData: "time.timeago",
+    seletorResumo: ".lead",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "JPP",
+      "Juntos Pelo Povo",
+      "Élvio Sousa",
+      "partido JPP",
+    ],
+  },
+
+  jpp_cnn: {
+    url: "https://cnnportugal.iol.pt/noticias/jpp",
+    baseUrl: "https://cnnportugal.iol.pt",
+    nome: "JPP",
+    fonte_original: "CNN Portugal",
+    categoria: "stake_partidos",
+    seletores: [
+      ".item a",
+      ".item-title a",
+      "article .item a",
+    ],
+    seletorData: ".item-date",
+    seletorResumo: ".item-description",
+    tipo_conteudo: "noticia",
+    palavras_chave: [
+      "JPP",
+      "Juntos Pelo Povo",
+      "Élvio Sousa",
+      "partido JPP",
+    ],
   },
 };
 
@@ -517,10 +872,22 @@ async function scrapeStakeholder(stakeholderId, config) {
               const baseUrl = config.baseUrl || config.url;
               const urlCompleta = limparUrl(baseUrl, url);
 
+              // ✅ FILTRO PARA PARTIDOS - verificar no título
+              if (config.categoria === "stake_partidos" && config.palavras_chave) {
+                const tituloLower = titulo.toLowerCase();
+                const contemPalavraChave = config.palavras_chave.some(palavra => 
+                  tituloLower.includes(palavra.toLowerCase())
+                );
+                
+                if (!contemPalavraChave) {
+                  return; // Ignorar esta notícia
+                }
+              }
+
               // Extrair data
               let data = new Date().toISOString().split("T")[0];
               if (config.seletorData) {
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card");
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card, .mod");
                 const dataTexto = $container.find(config.seletorData).first().text().trim();
                 if (dataTexto) {
                   const dataParsed = parseData(dataTexto);
@@ -531,14 +898,26 @@ async function scrapeStakeholder(stakeholderId, config) {
               // Extrair resumo
               let resumo = titulo.substring(0, 200);
               if (config.seletorResumo) {
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card");
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card, .mod");
                 const resumoTexto = $container.find(config.seletorResumo).first().text().trim();
                 if (resumoTexto && resumoTexto.length > 20) {
                   resumo = resumoTexto.substring(0, 300);
                 }
               }
 
-              // ✅ NOVO: Construir documento com fonte_original para partidos
+              // ✅ FILTRO ADICIONAL: verificar também no resumo
+              if (config.categoria === "stake_partidos" && config.palavras_chave) {
+                const resumoLower = resumo.toLowerCase();
+                const contemPalavraChave = config.palavras_chave.some(palavra => 
+                  resumoLower.includes(palavra.toLowerCase())
+                );
+                
+                if (!contemPalavraChave) {
+                  return; // Ignorar esta notícia
+                }
+              }
+
+              // Construir documento
               const documento = {
                 tipo_conteudo: config.tipo_conteudo,
                 tipo_radar: "stakeholders",
@@ -547,7 +926,7 @@ async function scrapeStakeholder(stakeholderId, config) {
                 data_publicacao: data,
                 url: urlCompleta,
                 fonte: "stakeholders",
-                entidades: config.nome,  // Nome do partido (ex: "PSD")
+                entidades: config.nome,
                 resumo: resumo,
               };
 
@@ -571,7 +950,7 @@ async function scrapeStakeholder(stakeholderId, config) {
         return 0;
       }
 
-      console.log(`  📊 Encontrados: ${documentos.length} documentos`);
+      console.log(`  📊 Encontrados: ${documentos.length} documentos (após filtros)`);
 
       // Guardar na BD
       let novosGuardados = 0;
