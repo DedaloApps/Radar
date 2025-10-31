@@ -363,24 +363,29 @@ const STAKEHOLDERS_CONFIG = {
 
   // IMOBILIÁRIO/HABITAÇÃO
   cmvm: {
-    url: "https://www.cmvm.pt/pt/Comunicados/Paginas/Index.aspx",
+    url: "https://www.cmvm.pt/PInstitucional/Content?Input=AA705D4345ECEED10489BB4C4251855EB3212B697F98169A3E39F971F60ECC1B",
+    baseUrl: "https://www.cmvm.pt",
     nome: "CMVM",
     categoria: "stake_imobiliario",
-    seletor: ".comunicado-link",
+    seletores: [
+      ".gc-card-layout__title span",
+      ".gc-card-layout__title",
+    ],
+    seletorData: ".gc-date", // Extração especial
+    seletorResumo: ".gc-card-layout__description",
     tipo_conteudo: "comunicado",
   },
   dgterritorio: {
-    url: "https://www.dgterritorio.gov.pt/noticias",
+    url: "https://www.dgterritorio.gov.pt/todas-noticias",
     baseUrl: "https://www.dgterritorio.gov.pt",
     nome: "DGTerritório",
     categoria: "stake_imobiliario",
     seletores: [
       ".post-title a",
       ".post-block .post-title a",
-      "a[href*='/ciclo']",
     ],
     seletorData: ".post-created",
-    seletorResumo: ".post-body",
+    seletorResumo: ".post-body .field--name-body",
     tipo_conteudo: "noticia",
   },
   ihru: {
@@ -390,8 +395,7 @@ const STAKEHOLDERS_CONFIG = {
     categoria: "stake_imobiliario",
     seletores: [
       ".noticiasLink a",
-      ".noticiasItem a",
-      "a[title*='Saber mais']",
+      ".noticiasItem .noticiasLink a",
     ],
     seletorData: ".noticiasDate",
     seletorResumo: ".noticiasTitle",
@@ -825,13 +829,11 @@ function limparUrl(baseUrl, url) {
 function limparTitulo(titulo) {
   if (!titulo) return titulo;
   
-  // Remove padrões de data no final do título
-  // Exemplos que remove: "18 mai, 21:43", "31 out 2025", "29/10/2025 15:30", "24 de outubro"
   return titulo
-    .replace(/\s+\d{1,2}\s+(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-z]*,?\s+\d{1,2}:\d{2}$/i, '') // "18 mai, 21:43"
-    .replace(/\s+\d{1,2}\s+de\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)[,\s]+\d{4}$/i, '') // "24 de outubro, 2025"
-    .replace(/\s+\d{1,2}\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)[,\s]+\d{4}$/i, '') // "24 outubro 2025"
-    .replace(/\s+\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}(\s+\d{1,2}:\d{2})?$/i, '') // "29/10/2025" ou "29/10/2025 15:30"
+    .replace(/\s+\d{1,2}\s+(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-z]*,?\s+\d{1,2}:\d{2}$/i, '')
+    .replace(/\s+\d{1,2}\s+de\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)[,\s]+\d{4}$/i, '')
+    .replace(/\s+\d{1,2}\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)[,\s]+\d{4}$/i, '')
+    .replace(/\s+\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}(\s+\d{1,2}:\d{2})?$/i, '')
     .trim();
 }
 
@@ -843,7 +845,6 @@ async function scrapeStakeholder(stakeholderId, config) {
   console.log(`\n📡 ${config.nome} (${stakeholderId})`);
   console.log(`   URL: ${config.url}`);
 
-  // Tentar 3 vezes antes de desistir
   for (let tentativa = 1; tentativa <= 3; tentativa++) {
     try {
       const axiosConfig = {
@@ -860,12 +861,9 @@ async function scrapeStakeholder(stakeholderId, config) {
       }
       
       const response = await axios.get(config.url, axiosConfig);
-
       const $ = cheerio.load(response.data);
       const documentos = [];
-      let seletorUsado = null;
 
-      // Tentar cada seletor até encontrar resultados
       const seletores = Array.isArray(config.seletores) ? config.seletores : [config.seletor];
       
       for (const seletor of seletores) {
@@ -873,10 +871,9 @@ async function scrapeStakeholder(stakeholderId, config) {
         
         if (elementos.length > 0) {
           console.log(`   ✓ Seletor funcionou: "${seletor}" (${elementos.length} elementos)`);
-          seletorUsado = seletor;
 
           elementos.each((index, element) => {
-            if (index >= 30) return false; // Limitar a 30 notícias
+            if (index >= 30) return false;
 
             const $link = $(element);
             const titulo = $link.text().trim();
@@ -886,22 +883,36 @@ async function scrapeStakeholder(stakeholderId, config) {
               const baseUrl = config.baseUrl || config.url;
               const urlCompleta = limparUrl(baseUrl, url);
 
-              // ✅ FILTRO PARA PARTIDOS - verificar no título
+              // Filtro para partidos
               if (config.categoria === "stake_partidos" && config.palavras_chave) {
                 const tituloLower = titulo.toLowerCase();
                 const contemPalavraChave = config.palavras_chave.some(palavra => 
                   tituloLower.includes(palavra.toLowerCase())
                 );
-                
-                if (!contemPalavraChave) {
-                  return; // Ignorar esta notícia
-                }
+                if (!contemPalavraChave) return;
               }
 
-              // Extrair data
+              // ✅ EXTRAÇÃO ESPECIAL PARA CMVM
               let data = new Date().toISOString().split("T")[0];
-              if (config.seletorData) {
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card, .mod");
+              
+              if (stakeholderId === 'cmvm') {
+                const $container = $link.closest(".gc-card-layout");
+                const dia = $container.find(".gc-date__day").text().trim();
+                const mes = $container.find(".gc-date__month").text().trim();
+                const ano = $container.find(".gc-date__year").text().trim();
+                
+                if (dia && mes && ano) {
+                  const mesesPT = {
+                    'Jan': '01', 'Fev': '02', 'Mar': '03', 'Abr': '04',
+                    'Mai': '05', 'Jun': '06', 'Jul': '07', 'Ago': '08',
+                    'Set': '09', 'Out': '10', 'Nov': '11', 'Dez': '12'
+                  };
+                  const mesNum = mesesPT[mes] || '01';
+                  data = `${ano}-${mesNum}-${dia.padStart(2, '0')}`;
+                }
+              } else if (config.seletorData) {
+                // Extração normal
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, .noticiasItem, li, div, .row-fluid, .dvNew, .uk-card, .mod, .post-block");
                 const dataTexto = $container.find(config.seletorData).first().text().trim();
                 if (dataTexto) {
                   const dataParsed = parseData(dataTexto);
@@ -912,31 +923,27 @@ async function scrapeStakeholder(stakeholderId, config) {
               // Extrair resumo
               let resumo = titulo.substring(0, 200);
               if (config.seletorResumo) {
-                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, li, div, .row-fluid, .dvNew, .uk-card, .mod");
+                const $container = $link.closest("article, .news-item, .entry, .post, .destaque, .noticia, .noticiasItem, li, div, .row-fluid, .dvNew, .uk-card, .mod, .post-block");
                 const resumoTexto = $container.find(config.seletorResumo).first().text().trim();
                 if (resumoTexto && resumoTexto.length > 20) {
                   resumo = resumoTexto.substring(0, 300);
                 }
               }
 
-              // ✅ FILTRO ADICIONAL: verificar também no resumo
+              // Filtro adicional para partidos
               if (config.categoria === "stake_partidos" && config.palavras_chave) {
                 const resumoLower = resumo.toLowerCase();
                 const contemPalavraChave = config.palavras_chave.some(palavra => 
                   resumoLower.includes(palavra.toLowerCase())
                 );
-                
-                if (!contemPalavraChave) {
-                  return; // Ignorar esta notícia
-                }
+                if (!contemPalavraChave) return;
               }
 
-              // Construir documento
               const documento = {
                 tipo_conteudo: config.tipo_conteudo,
                 tipo_radar: "stakeholders",
                 categoria: config.categoria,
-                titulo: limparTitulo(titulo), // ✅ LIMPAR O TÍTULO
+                titulo: limparTitulo(titulo), // ✅ LIMPAR TÍTULO
                 data_publicacao: data,
                 url: urlCompleta,
                 fonte: "stakeholders",
@@ -944,7 +951,6 @@ async function scrapeStakeholder(stakeholderId, config) {
                 resumo: resumo,
               };
 
-              // ✅ Se for partido, adicionar fonte_original
               if (config.categoria === "stake_partidos" && config.fonte_original) {
                 documento.fonte_original = config.fonte_original;
               }
@@ -953,7 +959,7 @@ async function scrapeStakeholder(stakeholderId, config) {
             }
           });
 
-          break; // Encontrou resultados
+          break;
         } else {
           console.log(`   ✗ Seletor sem resultados: "${seletor}"`);
         }
@@ -964,9 +970,8 @@ async function scrapeStakeholder(stakeholderId, config) {
         return 0;
       }
 
-      console.log(`  📊 Encontrados: ${documentos.length} documentos (após filtros)`);
+      console.log(`  📊 Encontrados: ${documentos.length} documentos`);
 
-      // Guardar na BD
       let novosGuardados = 0;
       let duplicadosIgnorados = 0;
 
@@ -1005,7 +1010,7 @@ async function scrapeStakeholder(stakeholderId, config) {
 
       if (tentativa === 3 || error.response?.status === 403) {
         if (error.response?.status === 403) {
-          console.error(`  ❌ Acesso negado (403) - site tem proteção anti-scraping`);
+          console.error(`  ❌ Acesso negado (403)`);
         } else if (error.code === 'ECONNABORTED') {
           console.error(`  ❌ Timeout`);
         } else if (error.response?.status === 404) {
@@ -1022,7 +1027,7 @@ async function scrapeStakeholder(stakeholderId, config) {
   return 0;
 }
 
-// Função auxiliar para parsing de datas
+// ✅ Função de parsing de datas MELHORADA
 function parseData(dataString) {
   if (!dataString) return null;
 
@@ -1047,7 +1052,16 @@ function parseData(dataString) {
       'dezembro': '12', 'dez': '12',
     };
 
-    // "22 outubro 2025"
+    // ✅ Formato: "30 10 2025" (DGTerritório)
+    const matchDGT = texto.match(/^(\d{1,2})\s+(\d{1,2})\s+(\d{4})$/);
+    if (matchDGT) {
+      const dia = matchDGT[1].padStart(2, '0');
+      const mes = matchDGT[2].padStart(2, '0');
+      const ano = matchDGT[3];
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    // "29 out 2025" (IHRU)
     const matchPT = texto.match(/(\d{1,2})\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\s+(\d{4})/i);
     if (matchPT) {
       const dia = matchPT[1].padStart(2, '0');
@@ -1065,7 +1079,7 @@ function parseData(dataString) {
       return `${ano}-${mes}-${dia}`;
     }
 
-    // Formatos numéricos: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY
+    // Formatos numéricos
     const regexes = [
       /(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/,
       /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/,
@@ -1113,7 +1127,6 @@ export async function scrapeTodosStakeholders() {
     const novos = await scrapeStakeholder(stakeholderId, config);
     totalNovos += novos;
 
-    // Pausa entre requests
     await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
